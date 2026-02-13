@@ -31,7 +31,7 @@ export default function Home() {
     month: 'long',
     year: 'numeric',
     weekday: 'long'
-  }) : 'Yükleniyor...';
+  }) + ' (TR)' : 'Yükleniyor...';
 
   const errorMessage = data?.error;
 
