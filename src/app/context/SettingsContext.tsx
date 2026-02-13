@@ -16,16 +16,61 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-    const [theme, setTheme] = useState<Theme>('oled'); // Default to OLED for requested "OLED on OLED"
+    const [theme, setTheme] = useState<Theme>('oled');
     const [fontSize, setFontSize] = useState<FontSize>('normal');
     const [mounted, setMounted] = useState(false);
 
+    // Approximate Istanbul Sunrise/Sunset Data (Month: [Sunrise, Sunset])
+    // Used for auto-theme: Day starts Sunrise+1h, Night starts Sunset+2h
+    const getSeasonalTheme = (): Theme => {
+        const now = new Date();
+        const month = now.getMonth(); // 0-11
+        const hour = now.getHours();
+
+        // Data for Istanbul (approx 15th of each month)
+        const sunData = [
+            { rise: 8.5, set: 18.0 }, // Jan
+            { rise: 8.0, set: 18.7 }, // Feb
+            { rise: 7.25, set: 19.25 }, // Mar
+            { rise: 6.4, set: 19.8 }, // Apr
+            { rise: 5.75, set: 20.3 }, // May
+            { rise: 5.5, set: 20.7 }, // Jun
+            { rise: 5.7, set: 20.6 }, // Jul
+            { rise: 6.2, set: 20.0 }, // Aug
+            { rise: 6.7, set: 19.25 }, // Sep
+            { rise: 7.2, set: 18.5 }, // Oct
+            { rise: 7.8, set: 17.8 }, // Nov
+            { rise: 8.3, set: 17.7 }, // Dec
+        ];
+
+        const { rise, set } = sunData[month];
+
+        // Day Mode: Sunrise + 1 hour -> Sunset + 2 hours (wait, night is Sunset+2)
+        // User asked: "gunes dogduktan 1 saat sonra gunduz", "gunes battiktan 2 saat sonra gece"
+        // So Day interval: [Sunrise + 1, Sunset + 2]
+
+        const dayStart = rise + 1;
+        const nightStart = set + 2;
+
+        if (hour >= dayStart && hour < nightStart) {
+            return 'day';
+        } else {
+            return 'oled';
+        }
+    };
+
     useEffect(() => {
-        // Load saved settings
+        // Load saved settings or default to seasonal auto
         const savedTheme = localStorage.getItem('app-theme') as Theme;
         const savedFontSize = localStorage.getItem('app-font-size') as FontSize;
 
-        if (savedTheme) setTheme(savedTheme);
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            // No saved theme? Use smart auto!
+            setTheme(getSeasonalTheme());
+        }
+
         if (savedFontSize) setFontSize(savedFontSize);
         setMounted(true);
     }, []);

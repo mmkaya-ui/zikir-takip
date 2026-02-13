@@ -110,10 +110,10 @@ export default function Home() {
           </button>
 
           <motion.div>
-            <h1 className={`text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
+            <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
               İhlas-ı Şerif
             </h1>
-            <p className={`text-[10px] font-medium tracking-widest uppercase opacity-60`}>
+            <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1`}>
               {formattedDate}
             </p>
           </motion.div>
@@ -137,10 +137,10 @@ export default function Home() {
           ) : (
             <>
               <div className="text-center mb-2">
-                <div className={`text-5xl font-bold font-mono tracking-tighter drop-shadow-sm relative inline-block transition-colors duration-300 leading-none ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
+                <div className={`text-6xl font-bold font-mono tracking-tighter drop-shadow-sm relative inline-block transition-colors duration-300 leading-none ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
                   {total.toLocaleString()}
                 </div>
-                <div className="text-[10px] text-blue-500 mt-1 uppercase tracking-[0.2em] font-bold opacity-80">
+                <div className="text-sm text-blue-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-90">
                   Bugünkü Toplam
                 </div>
               </div>
@@ -156,8 +156,8 @@ export default function Home() {
         </div>
 
         {/* Footer with Help Button - tight below form */}
-        <div className="text-center shrink-0 flex flex-col items-center gap-1 mt-1">
-          <div className="text-[10px] opacity-40 font-medium uppercase tracking-widest">
+        <div className="text-center shrink-0 flex flex-col items-center gap-2 mt-2">
+          <div className="text-xs font-bold opacity-60 uppercase tracking-widest">
             Her gün Türkiye saati 22:00{"'"}da sıfırlanır
           </div>
 
