@@ -34,9 +34,9 @@ export default function ProgressBar({ current, target = 100000, theme }: { curre
                 {/* Shine effect on bar */}
                 <div className="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none rounded-full" />
             </div>
-            <div className="flex justify-between text-xs opacity-60 font-mono tracking-tighter">
+            <div className="flex justify-between text-sm opacity-80 font-mono tracking-tighter">
                 <span>0</span>
-                <span className="font-bold text-red-400 text-sm">Kalan: {(target - current).toLocaleString()}</span>
+                <span className="font-bold text-red-400 text-base">Kalan: {(target - current).toLocaleString()}</span>
                 <span>{target.toLocaleString()}</span>
             </div>
         </div>

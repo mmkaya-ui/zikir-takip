@@ -163,7 +163,7 @@ export default function Home() {
 
           <button
             onClick={() => setShowHelp(true)}
-            className={`text-[10px] font-bold px-3 py-1 rounded-full border transition-all ${theme === 'oled'
+            className={`text-sm font-bold px-4 py-1.5 rounded-full border transition-all ${theme === 'oled'
               ? 'border-white/10 text-emerald-400 hover:bg-white/10'
               : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}
           >
