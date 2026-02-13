@@ -17,7 +17,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
 
     useEffect(() => {
         if (success) {
-            const timer = setTimeout(() => setSuccess(false), 3000);
+            const timer = setTimeout(() => setSuccess(false), 2000);
             return () => clearTimeout(timer);
         }
     }, [success]);
