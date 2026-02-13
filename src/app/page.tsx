@@ -104,8 +104,8 @@ export default function Home() {
               }`}
             aria-label="Yazı Boyutunu Değiştir"
           >
-            <span className="font-bold text-lg leading-none">
-              {fontSize === 'normal' ? 'A' : fontSize === 'large' ? 'A+' : 'A++'}
+            <span className={`font-bold leading-none transition-all duration-300 ${fontSize === 'normal' ? 'text-lg' : fontSize === 'large' ? 'text-xl' : 'text-2xl'}`}>
+              A
             </span>
           </button>
 
