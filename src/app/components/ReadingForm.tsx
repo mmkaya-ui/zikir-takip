@@ -8,6 +8,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
     const [count, setCount] = useState('');
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
         const savedName = localStorage.getItem('userName');
@@ -46,6 +47,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
             if (res.ok) {
                 setCount('');
                 setSuccess(true);
+                setSuccessMessage(Math.random() > 0.5 ? 'Allah Kabul Etsin 🤲' : 'Allah Razı Olsun 🌹');
                 onAdd();
             } else if (res.status === 409 && data.requiresConfirmation) {
                 // Show confirmation dialog logic
@@ -130,7 +132,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                         : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-                {loading ? '...' : success ? '✓' : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
+                {loading ? '...' : success ? successMessage : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
             </button>
         </motion.form>
     );
