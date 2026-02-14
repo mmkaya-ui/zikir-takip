@@ -71,7 +71,28 @@ export async function getDoc() {
 
 export async function getSheet() {
   const doc = await getDoc();
-  return doc.sheetsByIndex[0]; // Assume first sheet
+  const effectiveDate = getEffectiveDate();
+
+  // Bugünün tarihiyle sheet tab'ı var mı?
+  let sheet = doc.sheetsByTitle[effectiveDate];
+
+  if (!sheet) {
+    // Yoksa yeni tab oluştur
+    sheet = await doc.addSheet({
+      title: effectiveDate,
+      headerValues: ['Tarih', 'İsim', 'Adet', 'Zaman'],
+    });
+
+    // G1'e label, G2'ye SUM formülü ekle
+    await sheet.loadCells('G1:G2');
+    const g1 = sheet.getCellByA1('G1');
+    const g2 = sheet.getCellByA1('G2');
+    g1.value = 'Toplam';
+    g2.formula = '=SUM(C2:C10000)';
+    await sheet.saveUpdatedCells();
+  }
+
+  return sheet;
 }
 
 // Helper to get "Effective Date" string YYYY-MM-DD
@@ -90,7 +111,6 @@ export function getEffectiveDate(): string {
   }
 
   // 4. Return YYYY-MM-DD format
-  // We use reliable formatting to avoid timezone shifts during string conversion
   const year = trtNow.getFullYear();
   const month = String(trtNow.getMonth() + 1).padStart(2, '0');
   const day = String(trtNow.getDate()).padStart(2, '0');
@@ -110,8 +130,6 @@ export async function addReading(name: string, count: number) {
   const date = getEffectiveDate();
   const timestamp = new Date().toISOString();
 
-  // Using Turkish Headers: Tarih, İsim, Adet, Zaman
-  // We prepend a single quote to Date to force Google Sheets to treat it as a string
   await sheet.addRow({
     'Tarih': `'${date}`,
     'İsim': name,
@@ -124,73 +142,36 @@ export async function getDailyTotal(): Promise<{ total: number, date: string, us
   const sheet = await getSheet();
   const effectiveDate = getEffectiveDate();
 
-  // Load rows for user-specific breakdown (Smart Correction)
-  const rows = await sheet.getRows();
-
-  // Load G2 cell for the trustworthy Total (User's Formula)
+  // G2 hücresindeki SUM formülünü oku — bu sheet sadece bugünün verilerini içerir
   await sheet.loadCells('G2');
   const g2Value = sheet.getCellByA1('G2').value;
 
   let total = 0;
-  // If G2 has a valid number, use it as the source of truth for Total
   if (typeof g2Value === 'number') {
     total = g2Value;
   }
 
+  // Kullanıcı bazlı dağılım (Smart Correction için gerekli)
+  const rows = await sheet.getRows();
   const userCounts: Record<string, number> = {};
-
-  // We still need to parse rows to know "Who added what TODAY" for the safety checks.
-  // This logic ensures 'userCounts' is strictly based on the app's filtered date.
-  let calculatedTotalFromRows = 0;
+  let calculatedTotal = 0;
 
   rows.forEach(row => {
-    // Get date from 'Tarih' column
-    const rowDate = row.get('Tarih');
+    const countVal = row.get('Adet');
+    const count = parseInt(countVal || '0', 10);
+    const name = row.get('İsim') || 'Anonim';
 
-    let match = false;
-    if (rowDate) {
-      // Robust date matching
-      const cleanRowDate = rowDate.toString().replace(/'/g, '').trim();
-
-      if (cleanRowDate === effectiveDate) match = true;
-
-      if (!match && cleanRowDate.includes('.')) {
-        const parts = cleanRowDate.split('.');
-        if (parts.length === 3) {
-          const reordered = `${parts[2]}-${parts[1]}-${parts[0]}`;
-          if (reordered === effectiveDate) match = true;
-        }
-      }
-
-      if (!match && cleanRowDate.includes('/')) {
-        const parts = cleanRowDate.split('/');
-        if (parts.length === 3) {
-          const reordered = `${parts[2]}-${parts[1]}-${parts[0]}`;
-          if (reordered === effectiveDate) match = true;
-        }
-      }
-    }
-
-    if (match) {
-      let countVal = row.get('Adet');
-      if (!countVal) countVal = row.get('Okunan Sayi');
-      if (!countVal) countVal = row.get('Count');
-
-      const count = parseInt(countVal || '0', 10);
-      const name = row.get('İsim') || row.get('Name') || 'Anonim';
-
-      if (!isNaN(count)) {
-        calculatedTotalFromRows += count;
-        // Aggregate per user
-        userCounts[name] = (userCounts[name] || 0) + count;
-      }
+    if (!isNaN(count)) {
+      calculatedTotal += count;
+      userCounts[name] = (userCounts[name] || 0) + count;
     }
   });
 
-  // Fallback: If G2 was empty/invalid, use the calculated total from rows
+  // G2 boşsa/geçersizse satırlardan hesapla
   if (typeof g2Value !== 'number') {
-    total = calculatedTotalFromRows;
+    total = calculatedTotal;
   }
 
   return { total, date: effectiveDate, userCounts };
 }
+
