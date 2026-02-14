@@ -56,6 +56,11 @@ export default function HelpModal({ isOpen, onClose, theme }: HelpModalProps) {
                             <span className="font-bold text-emerald-500 block mb-1">Düzeltme Yapmak İsterseniz ⚠️</span>
                             Yanlışlıkla fazla sayı girerseniz, eksili sayı (örneğin -100) girerek düzeltme yapabilirsiniz.
                         </p>
+
+                        <p>
+                            <span className="font-bold text-emerald-500 block mb-1">Kendi Adedim 👤</span>
+                            Toplam sayının altındaki <strong>Kendi Adedim</strong> butonuna tıklayarak bugün sizin toplam kaç adet girdiğinizi görebilirsiniz.
+                        </p>
                     </div>
 
                     {/* Close Button */}
