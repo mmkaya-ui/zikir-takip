@@ -115,6 +115,8 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                         type="number"
                         value={count}
                         onChange={(e) => setCount(e.target.value)}
+                        max="10000"
+                        min="-10000"
                         className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
                         placeholder="0"
                         required

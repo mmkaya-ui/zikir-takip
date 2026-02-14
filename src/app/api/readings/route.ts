@@ -67,6 +67,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Name and count are required' }, { status: 400 });
         }
 
+        // Max 10,000 per entry
+        if (Math.abs(finalCount) > 10000) {
+            return NextResponse.json({
+                success: false,
+                message: 'Tek seferde en fazla 10.000 girilebilir.'
+            }, { status: 400 });
+        }
+
         // SMART CORRECTION LOGIC
         // If the user is trying to subtract (negative count)
         if (finalCount < 0) {
