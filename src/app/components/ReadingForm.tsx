@@ -32,7 +32,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
             alert('Tek seferde en fazla 10.000 girilebilir.');
             return;
         }
-        if (Math.abs(finalCount) > 3000 && !forceConfirm) {
+        if (Math.abs(finalCount) > 2000 && !forceConfirm) {
             const confirmed = window.confirm(`${Math.abs(finalCount).toLocaleString()} adet girdiniz, onaylıyor musunuz?`);
             if (!confirmed) return;
         }
