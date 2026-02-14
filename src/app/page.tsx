@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ReadingForm from './components/ReadingForm';
 import ProgressBar from './components/ProgressBar';
 import { motion } from 'framer-motion';
@@ -13,7 +13,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function Home() {
   const { theme, setTheme, fontScale, fontSize, setFontSize } = useSettings();
   const [showHelp, setShowHelp] = useState(false);
-
+  const [showMyTotal, setShowMyTotal] = useState(false);
+  const [userName, setUserName] = useState('');
   // Poll every 10 seconds
   const { data, error, mutate } = useSWR('/api/readings', fetcher, {
     refreshInterval: 10000,
@@ -22,8 +23,14 @@ export default function Home() {
     errorRetryInterval: 5000
   });
 
+  useEffect(() => {
+    const saved = localStorage.getItem('userName');
+    if (saved) setUserName(saved);
+  }, [data]);
+
   const loading = !data && !error;
   const total = data?.total || 0;
+  const userCounts = data?.userCounts || {};
 
   const dateStr = data?.date;
   const formattedDate = dateStr ? new Date(dateStr).toLocaleDateString('tr-TR', {
@@ -143,6 +150,23 @@ export default function Home() {
                 <div className="text-sm text-blue-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-90">
                   Bugünkü Toplam
                 </div>
+                {userName && (
+                  <button
+                    onClick={() => setShowMyTotal(!showMyTotal)}
+                    className={`mt-2 text-xs font-bold px-3 py-1 rounded-full border transition-all active:scale-95 ${showMyTotal
+                      ? theme === 'oled'
+                        ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                        : 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                      : theme === 'oled'
+                        ? 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
+                      }`}
+                  >
+                    {showMyTotal
+                      ? `${userName}: ${(userCounts[userName] || 0).toLocaleString()} adet 📊`
+                      : 'Kendi Toplamım 👤'}
+                  </button>
+                )}
               </div>
 
               <ProgressBar current={total} target={100000} theme={theme} />
