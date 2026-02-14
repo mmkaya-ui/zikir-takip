@@ -10,10 +10,13 @@ export async function GET() {
         return NextResponse.json(data);
     } catch (error) {
         console.error(error);
-        // Return mock data if credentials are missing/invalid for demo purposes
-        // Or just fail. The user needs to set up credentials.
-        // For now, let's return a friendly error so the frontend doesn't crash completely
-        return NextResponse.json({ total: 0, date: new Date().toISOString().split('T')[0], error: 'Setup Required' }, { status: 200 });
+        const errMsg = error instanceof Error ? error.message : '';
+        const isCredentialError = errMsg.includes('credentials are not set') || errMsg.includes('private key');
+        return NextResponse.json({
+            total: 0,
+            date: new Date().toISOString().split('T')[0],
+            error: isCredentialError ? 'Setup Required' : 'Overloaded'
+        }, { status: 200 });
     }
 }
 

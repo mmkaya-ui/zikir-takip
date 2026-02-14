@@ -36,7 +36,7 @@ export default function ProgressBar({ current, target = 100000, theme }: { curre
             </div>
             <div className="flex justify-between text-sm opacity-80 font-mono tracking-tighter">
                 <span>0</span>
-                <span className="font-bold text-red-400 text-base">Kalan: {(target - current).toLocaleString()}</span>
+                <span className={`font-bold text-base ${current >= target ? 'text-emerald-400' : 'text-red-400'}`}>Kalan: {Math.max(0, target - current).toLocaleString()}</span>
                 <span>{target.toLocaleString()}</span>
             </div>
         </div>

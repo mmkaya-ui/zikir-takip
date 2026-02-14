@@ -120,8 +120,8 @@ export default function Home() {
         </div>
 
         {errorMessage && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-2 rounded-xl text-center text-xs font-semibold backdrop-blur-md shrink-0">
-            {errorMessage === 'Setup Required' ? 'Kurulum Gerekli' : errorMessage}
+          <div className={`p-2 rounded-xl text-center text-xs font-semibold backdrop-blur-md shrink-0 border ${errorMessage === 'Setup Required' ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-amber-500/10 border-amber-500/50 text-amber-500'}`}>
+            {errorMessage === 'Setup Required' ? 'Kurulum Gerekli' : errorMessage === 'Overloaded' ? 'Sistem çok yüklendi, birazdan tekrar deneyin ⏳' : errorMessage}
           </div>
         )}
 
