@@ -4,9 +4,46 @@ import { addReading, getDailyTotal } from '../../../lib/googleSheets';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// --- Cache + Dedup Layer ---
+const CACHE_TTL_MS = 3000; // 3 saniye
+let cachedData: { total: number; date: string; userCounts: Record<string, number> } | null = null;
+let cacheTimestamp = 0;
+let inflightRequest: Promise<{ total: number; date: string; userCounts: Record<string, number> }> | null = null;
+
+async function getCachedDailyTotal() {
+    // 1. Cache hâlâ taze mi?
+    if (cachedData && (Date.now() - cacheTimestamp < CACHE_TTL_MS)) {
+        return cachedData;
+    }
+
+    // 2. Dedup: Zaten devam eden bir istek var mı?
+    if (inflightRequest) {
+        return inflightRequest;
+    }
+
+    // 3. Yeni istek başlat ve paylaş
+    inflightRequest = getDailyTotal()
+        .then(data => {
+            cachedData = data;
+            cacheTimestamp = Date.now();
+            return data;
+        })
+        .finally(() => {
+            inflightRequest = null;
+        });
+
+    return inflightRequest;
+}
+
+export function invalidateCache() {
+    cachedData = null;
+    cacheTimestamp = 0;
+}
+// --- End Cache + Dedup Layer ---
+
 export async function GET() {
     try {
-        const data = await getDailyTotal();
+        const data = await getCachedDailyTotal();
         return NextResponse.json(data);
     } catch (error) {
         console.error(error);
@@ -64,6 +101,7 @@ export async function POST(request: Request) {
         }
 
         await addReading(name, finalCount);
+        invalidateCache(); // POST sonrası cache'i sıfırla → sonraki GET taze veri çeker
         return NextResponse.json({ success: true, adjusted: finalCount !== parseInt(count, 10) });
     } catch (error) {
         console.error(error);
