@@ -12,11 +12,6 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
     apple: "/icons/apple-touch-icon.png",
   },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "İhlas Takip",
-  },
 };
 
 export const viewport: Viewport = {
