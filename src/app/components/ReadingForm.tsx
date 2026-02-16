@@ -97,10 +97,8 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
         : 'bg-white border-indigo-100 shadow-xl shadow-indigo-100/50';
 
     return (
-        <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+    return (
+        <form
             onSubmit={handleSubmit}
             className={`relative z-20 p-5 rounded-2xl border space-y-3 ${theme === 'oled' ? 'bg-[#1a1a1a]/95' : 'bg-white/95'} ${containerClass}`}
         >
@@ -115,6 +113,8 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                         className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass}`}
                         placeholder="Adınız"
                         required
+                        style={{ userSelect: 'text', WebkitUserSelect: 'text', touchAction: 'manipulation' }}
+                        onTouchStart={(e) => e.stopPropagation()}
                     />
                 </div>
 
@@ -125,10 +125,11 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                         type="number"
                         value={count}
                         onChange={(e) => setCount(e.target.value)}
-
                         className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
                         placeholder="0"
                         required
+                        style={{ userSelect: 'text', WebkitUserSelect: 'text', touchAction: 'manipulation' }}
+                        onTouchStart={(e) => e.stopPropagation()}
                     />
                 </div>
             </div>
@@ -145,6 +146,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
             >
                 {loading ? '...' : success ? successMessage : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
             </button>
-        </motion.form>
+        </form>
+    );
     );
 }
