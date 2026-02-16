@@ -106,7 +106,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className={`p-5 rounded-2xl border backdrop-blur-md space-y-3 transition-colors duration-500 ${containerClass}`}
+            className={`p-5 rounded-2xl border space-y-3 transition-colors duration-500 ${containerClass}`}
         >
             <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="flex gap-3">
@@ -117,7 +117,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass}`}
+                            className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-[50] cursor-text ${inputBgClass}`}
                             placeholder="Adınız"
                             required
                         />
@@ -131,7 +131,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
                             value={count}
                             onChange={(e) => setCount(e.target.value)}
 
-                            className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
+                            className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-[50] cursor-text ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
                             placeholder="0"
                             required
                         />
