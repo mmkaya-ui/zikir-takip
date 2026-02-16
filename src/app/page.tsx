@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative transition-colors duration-500 font-sans`}>
       {/* Background Ambience - Optimized for Mobile GPU */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         {theme === 'oled' ? (
           <>
             <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-blue-900/10 rounded-full blur-[50px] opacity-30"></div>
@@ -175,7 +175,7 @@ export default function Home() {
         </motion.div>
 
         {/* Reading Form - Directly below stats card */}
-        <div className="shrink-0">
+        <div className="shrink-0 relative z-20">
           <ReadingForm
             onAdd={(newData) => {
               if (newData && data) {
