@@ -77,7 +77,7 @@ export default function Home() {
         )}
       </div>
 
-      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
+
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -207,9 +207,10 @@ export default function Home() {
               ? 'border-white/10 text-emerald-400 hover:bg-white/10'
               : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}
           >
-            Nasıl Çalışır? ℹ️
           </button>
         </div>
+
+        <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
 
       </motion.div>
     </main>
