@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme?: string }) {
+export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: string, newTotal: number, newUserCount: number }) => void, theme?: string }) {
     const [name, setName] = useState('');
     const [count, setCount] = useState('');
     const [loading, setLoading] = useState(false);
@@ -58,7 +58,12 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                 setCount('');
                 setSuccess(true);
                 setSuccessMessage(Math.random() > 0.5 ? 'Allah Kabul Etsin 🤲' : 'Allah Razı Olsun 🌹');
-                onAdd();
+                // Pass optimistic data if available
+                if (data.newTotal !== undefined) {
+                    onAdd({ name, newTotal: data.newTotal, newUserCount: data.newUserCount });
+                } else {
+                    onAdd();
+                }
             } else if (res.status === 409 && data.requiresConfirmation) {
                 // Show confirmation dialog logic
                 const confirmed = window.confirm(

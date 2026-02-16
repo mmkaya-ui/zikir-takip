@@ -176,7 +176,23 @@ export default function Home() {
 
         {/* Reading Form - Directly below stats card */}
         <div className="shrink-0">
-          <ReadingForm onAdd={() => mutate()} theme={theme} />
+          <ReadingForm
+            onAdd={(newData) => {
+              if (newData && data) {
+                mutate({
+                  ...data,
+                  total: newData.newTotal,
+                  userCounts: {
+                    ...(data.userCounts || {}),
+                    [newData.name]: newData.newUserCount
+                  }
+                }, { revalidate: false });
+              } else {
+                mutate();
+              }
+            }}
+            theme={theme}
+          />
         </div>
 
         {/* Footer with Help Button - tight below form */}
