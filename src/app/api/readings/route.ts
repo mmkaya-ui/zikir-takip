@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 // --- Cache + Dedup Layer ---
-const CACHE_TTL_MS = 3000; // 3 saniye
+const CACHE_TTL_MS = 5000; // 5 saniye (User requested)
 let cachedData: { total: number; date: string; userCounts: Record<string, number> } | null = null;
 let cacheTimestamp = 0;
 let inflightRequest: Promise<{ total: number; date: string; userCounts: Record<string, number> }> | null = null;
