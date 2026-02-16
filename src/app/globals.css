@@ -16,35 +16,14 @@ body {
   padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
-  /* overscroll-behavior-y: none; <-- Temporarily disabled to specific iOS keyboard glitch */
+  overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
   width: 100%;
 }
 
-input,
-textarea,
-button,
-select,
-a {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-input,
-textarea {
-  user-select: text !important;
-  -webkit-user-select: text !important;
-  touch-action: manipulation;
-}
-
 /* Hide scrollbar */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 .theme-oled {
   background-color: #000000;
