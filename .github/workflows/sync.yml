@@ -1,0 +1,15 @@
+name: Sync Redis to Google Sheets
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # Run every 10 minutes
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Sync Endpoint
+        run: |
+          curl -X GET "${{ secrets.APP_URL }}/api/cron/sync" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
