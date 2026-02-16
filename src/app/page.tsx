@@ -17,7 +17,7 @@ export default function Home() {
   const [userName, setUserName] = useState('');
   // Poll every 10 seconds
   const { data, error, mutate } = useSWR('/api/readings', fetcher, {
-    refreshInterval: 10000,
+    refreshInterval: 5000,
     revalidateOnFocus: true,
     shouldRetryOnError: true,
     errorRetryInterval: 5000
