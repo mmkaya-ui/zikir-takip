@@ -97,7 +97,6 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
         : 'bg-white border-indigo-100 shadow-xl shadow-indigo-100/50';
 
     return (
-    return (
         <form
             onSubmit={handleSubmit}
             className={`relative z-20 p-5 rounded-2xl border space-y-3 ${theme === 'oled' ? 'bg-[#1a1a1a]/95' : 'bg-white/95'} ${containerClass}`}
@@ -147,6 +146,5 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                 {loading ? '...' : success ? successMessage : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
             </button>
         </form>
-    );
     );
 }
