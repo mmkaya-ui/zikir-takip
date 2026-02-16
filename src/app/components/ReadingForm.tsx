@@ -117,7 +117,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass}`}
+                        className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass}`}
                         placeholder="Adınız"
                         required
                     />
@@ -131,7 +131,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
                         value={count}
                         onChange={(e) => setCount(e.target.value)}
 
-                        className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
+                        className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
                         placeholder="0"
                         required
                     />
