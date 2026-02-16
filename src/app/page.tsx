@@ -61,7 +61,7 @@ export default function Home() {
     : 'from-emerald-600 via-green-700 to-emerald-800';
 
   return (
-    <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative transition-colors duration-500 font-sans`}>
+    <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative font-sans`}>
       {/* Background Ambience */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {theme === 'oled' ? (
@@ -134,7 +134,7 @@ export default function Home() {
 
         {/* Stats Card */}
         <motion.div
-          className={`rounded-2xl p-4 border backdrop-blur-2xl relative overflow-hidden group transition-colors duration-500 shrink-0 ${cardClass}`}
+          className={`rounded-2xl p-4 border backdrop-blur-md relative overflow-hidden group shrink-0 ${cardClass}`}
         >
           {loading ? (
             <div className="animate-pulse space-y-4 flex flex-col items-center">
