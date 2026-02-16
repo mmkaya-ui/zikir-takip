@@ -102,54 +102,55 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
         : 'bg-white border-indigo-100 shadow-xl shadow-indigo-100/50';
 
     return (
-        <motion.form
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            onSubmit={handleSubmit}
             className={`p-5 rounded-2xl border backdrop-blur-md space-y-3 transition-colors duration-500 ${containerClass}`}
         >
-            <div className="flex gap-3">
-                <div className="flex-1">
-                    <label htmlFor="name" className={`block text-xs font-bold uppercase tracking-wider mb-1 ml-1 ${labelClass}`}>İsim</label>
-                    <input
-                        id="name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass}`}
-                        placeholder="Adınız"
-                        required
-                    />
+            <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="flex gap-3">
+                    <div className="flex-1">
+                        <label htmlFor="name" className={`block text-xs font-bold uppercase tracking-wider mb-1 ml-1 ${labelClass}`}>İsim</label>
+                        <input
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass}`}
+                            placeholder="Adınız"
+                            required
+                        />
+                    </div>
+
+                    <div className="w-1/3">
+                        <label htmlFor="count" className={`block text-xs font-bold uppercase tracking-wider mb-1 ml-1 ${labelClass}`}>Adet</label>
+                        <input
+                            id="count"
+                            type="number"
+                            value={count}
+                            onChange={(e) => setCount(e.target.value)}
+
+                            className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
+                            placeholder="0"
+                            required
+                        />
+                    </div>
                 </div>
 
-                <div className="w-1/3">
-                    <label htmlFor="count" className={`block text-xs font-bold uppercase tracking-wider mb-1 ml-1 ${labelClass}`}>Adet</label>
-                    <input
-                        id="count"
-                        type="number"
-                        value={count}
-                        onChange={(e) => setCount(e.target.value)}
-
-                        className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm relative z-10 ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
-                        placeholder="0"
-                        required
-                    />
-                </div>
-            </div>
-
-            <button
-                type="submit"
-                disabled={loading}
-                className={`w-full font-bold py-3 px-4 rounded-xl transition-all shadow-lg transform active:scale-[0.98] text-sm ${success
-                    ? 'bg-emerald-500 text-white shadow-emerald-500/30'
-                    : isNegative
-                        ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30'
-                        : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-                {loading ? '...' : success ? successMessage : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
-            </button>
-        </motion.form>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full font-bold py-3 px-4 rounded-xl transition-all shadow-lg transform active:scale-[0.98] text-sm ${success
+                        ? 'bg-emerald-500 text-white shadow-emerald-500/30'
+                        : isNegative
+                            ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/30'
+                            : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                    {loading ? '...' : success ? successMessage : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
+                </button>
+            </form>
+        </motion.div>
     );
 }
