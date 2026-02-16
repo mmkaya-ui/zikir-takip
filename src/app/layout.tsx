@@ -41,6 +41,19 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Fix for iOS PWA "unclickable inputs"
+              document.addEventListener('touchstart', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                  // Allow the event to pass through to the input
+                  e.target.focus();
+                }
+              }, { passive: false });
+            `,
+          }}
+        />
       </head>
       <body className={outfit.className}>
         <ErrorBoundary>
