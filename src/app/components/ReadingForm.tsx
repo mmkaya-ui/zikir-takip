@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme?: string }) {
+export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: string, newTotal: number, newUserCount: number }) => void, theme?: string }) {
     const [name, setName] = useState('');
     const [count, setCount] = useState('');
     const [loading, setLoading] = useState(false);
@@ -58,7 +58,12 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                 setCount('');
                 setSuccess(true);
                 setSuccessMessage(Math.random() > 0.5 ? 'Allah Kabul Etsin 🤲' : 'Allah Razı Olsun 🌹');
-                onAdd();
+                // Pass optimistic data if available
+                if (data.newTotal !== undefined) {
+                    onAdd({ name, newTotal: data.newTotal, newUserCount: data.newUserCount });
+                } else {
+                    onAdd();
+                }
             } else if (res.status === 409 && data.requiresConfirmation) {
                 // Show confirmation dialog logic
                 const confirmed = window.confirm(
@@ -97,9 +102,12 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
         : 'bg-white border-indigo-100 shadow-xl shadow-indigo-100/50';
 
     return (
-        <form
+        <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
             onSubmit={handleSubmit}
-            className={`relative z-20 p-5 rounded-2xl border space-y-3 ${theme === 'oled' ? 'bg-[#1a1a1a]/95' : 'bg-white/95'} ${containerClass}`}
+            className={`p-5 rounded-2xl border backdrop-blur-lg space-y-3 transition-colors duration-500 ${containerClass}`}
         >
             <div className="flex gap-3">
                 <div className="flex-1">
@@ -112,8 +120,6 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                         className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass}`}
                         placeholder="Adınız"
                         required
-                        style={{ userSelect: 'text', WebkitUserSelect: 'text', touchAction: 'manipulation' }}
-                        onTouchStart={(e) => e.stopPropagation()}
                     />
                 </div>
 
@@ -124,11 +130,10 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
                         type="number"
                         value={count}
                         onChange={(e) => setCount(e.target.value)}
+
                         className={`w-full px-3 py-3 rounded-xl border outline-none transition-all font-medium text-sm ${inputBgClass} ${isNegative ? 'text-red-500' : ''}`}
                         placeholder="0"
                         required
-                        style={{ userSelect: 'text', WebkitUserSelect: 'text', touchAction: 'manipulation' }}
-                        onTouchStart={(e) => e.stopPropagation()}
                     />
                 </div>
             </div>
@@ -145,6 +150,6 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: () => void, theme
             >
                 {loading ? '...' : success ? successMessage : isNegative ? 'Düzelt (Çıkar)' : 'Kaydet'}
             </button>
-        </form>
+        </motion.form>
     );
 }

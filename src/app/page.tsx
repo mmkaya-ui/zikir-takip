@@ -61,17 +61,23 @@ export default function Home() {
     : 'from-emerald-600 via-green-700 to-emerald-800';
 
   return (
-    <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative font-sans`}>
+    <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative transition-colors duration-500 font-sans`}>
       {/* Background Ambience */}
-      {/* Background Ambience - Static Gradient Optimization */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className={`absolute inset-0 opacity-40 ${theme === 'oled'
-          ? 'bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-[#000] to-[#000]'
-          : 'bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-white to-white'}`}>
-        </div>
+        {theme === 'oled' ? (
+          <>
+            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] opacity-30"></div>
+            <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[100px] opacity-30"></div>
+          </>
+        ) : (
+          <>
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/60 rounded-full blur-[120px] mix-blend-multiply opacity-70"></div>
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-100/60 rounded-full blur-[100px] mix-blend-multiply opacity-70"></div>
+          </>
+        )}
       </div>
 
-
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -128,7 +134,7 @@ export default function Home() {
 
         {/* Stats Card */}
         <motion.div
-          className={`rounded-2xl p-4 border relative overflow-hidden group shrink-0 ${theme === 'oled' ? 'bg-[#111]/90' : 'bg-white/90'} ${cardClass}`}
+          className={`rounded-2xl p-4 border backdrop-blur-2xl relative overflow-hidden group transition-colors duration-500 shrink-0 ${cardClass}`}
         >
           {loading ? (
             <div className="animate-pulse space-y-4 flex flex-col items-center">
@@ -170,7 +176,23 @@ export default function Home() {
 
         {/* Reading Form - Directly below stats card */}
         <div className="shrink-0">
-          <ReadingForm onAdd={() => mutate()} theme={theme} />
+          <ReadingForm
+            onAdd={(newData) => {
+              if (newData && data) {
+                mutate({
+                  ...data,
+                  total: newData.newTotal,
+                  userCounts: {
+                    ...(data.userCounts || {}),
+                    [newData.name]: newData.newUserCount
+                  }
+                }, { revalidate: false });
+              } else {
+                mutate();
+              }
+            }}
+            theme={theme}
+          />
         </div>
 
         {/* Footer with Help Button - tight below form */}
@@ -190,7 +212,7 @@ export default function Home() {
         </div>
 
       </motion.div>
-      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
     </main>
   );
 }
+
