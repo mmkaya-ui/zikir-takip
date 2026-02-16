@@ -77,7 +77,7 @@ export default function Home() {
         )}
       </div>
 
-      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
+
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -196,6 +196,7 @@ export default function Home() {
         </div>
 
       </motion.div>
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
     </main>
   );
 }
