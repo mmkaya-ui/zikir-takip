@@ -1,5 +1,5 @@
-import { redis } from '../../../../lib/redis';
-import { getDailyTotal } from '../../../../lib/googleSheets';
+import { redis } from '../../../lib/redis';
+import { getDailyTotal } from '../../../lib/googleSheets';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
