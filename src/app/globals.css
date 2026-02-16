@@ -21,6 +21,15 @@ body {
   width: 100%;
 }
 
+/* Fix for iOS PWA unclickable inputs */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+  /* Prevent zoom on focus */
+  font-size: 16px;
+}
+
 /* Hide scrollbar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
