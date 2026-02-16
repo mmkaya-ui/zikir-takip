@@ -15,7 +15,7 @@ export async function GET(request: Request) {
         // 2. Pop from Queue (Batch Size: 100)
         // LPOP count is supported in newer Redis, but Upstash REST creates a pipeline for safety
         const BATCH_SIZE = 100;
-        const rawEntries = await redis.lpop('ihlas:sync_queue', BATCH_SIZE);
+        const rawEntries = await redis.lpop('ihlas:sync_queue', BATCH_SIZE) as string[] | null;
 
         if (!rawEntries || rawEntries.length === 0) {
             return NextResponse.json({ message: 'Queue empty', syncCount: 0 });
