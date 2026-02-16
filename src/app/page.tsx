@@ -15,12 +15,12 @@ export default function Home() {
   const [showHelp, setShowHelp] = useState(false);
   const [showMyTotal, setShowMyTotal] = useState(false);
   const [userName, setUserName] = useState('');
-  // Poll every 10 seconds
+  // Poll every 25 seconds to save battery/memory on mobile
   const { data, error, mutate } = useSWR('/api/readings', fetcher, {
-    refreshInterval: 10000,
+    refreshInterval: 25000,
     revalidateOnFocus: true,
     shouldRetryOnError: true,
-    errorRetryInterval: 5000
+    errorRetryInterval: 10000
   });
 
   useEffect(() => {
@@ -62,17 +62,17 @@ export default function Home() {
 
   return (
     <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative transition-colors duration-500 font-sans`}>
-      {/* Background Ambience */}
+      {/* Background Ambience - Optimized for Mobile GPU */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {theme === 'oled' ? (
           <>
-            <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] opacity-30"></div>
-            <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[100px] opacity-30"></div>
+            <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-blue-900/10 rounded-full blur-[50px] opacity-30"></div>
+            <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-purple-900/10 rounded-full blur-[50px] opacity-30"></div>
           </>
         ) : (
           <>
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/60 rounded-full blur-[120px] mix-blend-multiply opacity-70"></div>
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-100/60 rounded-full blur-[100px] mix-blend-multiply opacity-70"></div>
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-100/60 rounded-full blur-[60px] mix-blend-multiply opacity-70"></div>
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-100/60 rounded-full blur-[60px] mix-blend-multiply opacity-70"></div>
           </>
         )}
       </div>
@@ -134,7 +134,7 @@ export default function Home() {
 
         {/* Stats Card */}
         <motion.div
-          className={`rounded-2xl p-4 border backdrop-blur-2xl relative overflow-hidden group transition-colors duration-500 shrink-0 ${cardClass}`}
+          className={`rounded-2xl p-4 border backdrop-blur-md relative overflow-hidden group transition-colors duration-500 shrink-0 ${cardClass}`}
         >
           {loading ? (
             <div className="animate-pulse space-y-4 flex flex-col items-center">
