@@ -61,7 +61,7 @@ export default function Home() {
     : 'from-emerald-600 via-green-700 to-emerald-800';
 
   return (
-    <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative transition-colors duration-500 font-sans`}>
+    <main className={`min-h-[100dvh] w-full flex flex-col items-center py-6 px-4 relative font-sans`}>
       {/* Background Ambience - Optimized for Mobile GPU */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         {theme === 'oled' ? (
@@ -134,7 +134,7 @@ export default function Home() {
 
         {/* Stats Card */}
         <motion.div
-          className={`rounded-2xl p-4 border backdrop-blur-md relative overflow-hidden group transition-colors duration-500 shrink-0 ${cardClass}`}
+          className={`rounded-2xl p-4 border backdrop-blur-md relative overflow-hidden group shrink-0 ${cardClass}`}
         >
           {loading ? (
             <div className="animate-pulse space-y-4 flex flex-col items-center">
@@ -144,7 +144,7 @@ export default function Home() {
           ) : (
             <>
               <div className="text-center mb-2">
-                <div className={`text-6xl font-bold font-mono tracking-tighter drop-shadow-sm relative inline-block transition-colors duration-300 leading-none ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
+                <div className={`text-6xl font-bold font-mono tracking-tighter drop-shadow-sm relative inline-block leading-none ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
                   {total.toLocaleString()}
                 </div>
                 <div className="text-sm text-blue-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-90 transition-none">
