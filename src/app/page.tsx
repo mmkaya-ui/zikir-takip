@@ -86,10 +86,24 @@ export default function Home() {
       >
         {/* Header Section */}
         <div className="text-center space-y-0.5 relative shrink-0 pt-2">
-          {/* Quick Theme Toggle (Left) */}
+          {/* Quick Font Size Toggle (Left) - Was Right */}
+          <button
+            onClick={cycleFontSize}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 w-[42px] h-[42px] flex items-center justify-center rounded-full transition-all active:scale-95 border ${theme === 'oled'
+              ? 'bg-white/5 text-blue-300 border-white/20 hover:bg-white/10'
+              : 'bg-white text-slate-500 border-slate-200 shadow-sm hover:bg-slate-50'
+              }`}
+            aria-label="Yazı Boyutunu Değiştir"
+          >
+            <span className={`font-bold leading-none transition-all duration-300 ${fontSize === 'normal' ? 'text-lg' : fontSize === 'large' ? 'text-xl' : 'text-2xl'}`}>
+              A
+            </span>
+          </button>
+
+          {/* Quick Theme Toggle (Right) - Was Left */}
           <button
             onClick={toggleTheme}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 p-2.5 rounded-full transition-all active:scale-95 border ${theme === 'oled'
+            className={`absolute right-0 top-1/2 -translate-y-1/2 p-2.5 rounded-full transition-all active:scale-95 border ${theme === 'oled'
               ? 'bg-white/5 text-yellow-300 border-white/20 hover:bg-white/10'
               : 'bg-white text-orange-500 border-slate-200 shadow-sm hover:bg-slate-50'
               }`}
@@ -102,25 +116,11 @@ export default function Home() {
             )}
           </button>
 
-          {/* Quick Font Size Toggle (Right) */}
-          <button
-            onClick={cycleFontSize}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 w-[42px] h-[42px] flex items-center justify-center rounded-full transition-all active:scale-95 border ${theme === 'oled'
-              ? 'bg-white/5 text-blue-300 border-white/20 hover:bg-white/10'
-              : 'bg-white text-slate-500 border-slate-200 shadow-sm hover:bg-slate-50'
-              }`}
-            aria-label="Yazı Boyutunu Değiştir"
-          >
-            <span className={`font-bold leading-none transition-all duration-300 ${fontSize === 'normal' ? 'text-lg' : fontSize === 'large' ? 'text-xl' : 'text-2xl'}`}>
-              A
-            </span>
-          </button>
-
           <motion.div>
             <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
               İhlas-ı Şerif
             </h1>
-            <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1`}>
+            <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1 transition-none`}>
               {formattedDate}
             </p>
           </motion.div>
@@ -147,7 +147,7 @@ export default function Home() {
                 <div className={`text-6xl font-bold font-mono tracking-tighter drop-shadow-sm relative inline-block transition-colors duration-300 leading-none ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
                   {total.toLocaleString()}
                 </div>
-                <div className="text-sm text-blue-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-90">
+                <div className="text-sm text-blue-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-90 transition-none">
                   Bugünkü Toplam
                 </div>
                 {userName && (
@@ -197,13 +197,13 @@ export default function Home() {
 
         {/* Footer with Help Button - tight below form */}
         <div className="text-center shrink-0 flex flex-col items-center gap-2 mt-2">
-          <div className="text-xs font-bold opacity-60 uppercase tracking-widest">
+          <div className="text-xs font-bold opacity-60 uppercase tracking-widest transition-none">
             Her gün Türkiye saati 22:00{"'"}da sıfırlanır
           </div>
 
           <button
             onClick={() => setShowHelp(true)}
-            className={`text-sm font-bold px-4 py-1.5 rounded-full border transition-all ${theme === 'oled'
+            className={`text-sm font-bold px-4 py-1.5 rounded-full border transition-none ${theme === 'oled'
               ? 'border-white/10 text-emerald-400 hover:bg-white/10'
               : 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'}`}
           >

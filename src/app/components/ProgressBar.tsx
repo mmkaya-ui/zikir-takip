@@ -14,12 +14,12 @@ export default function ProgressBar({ current, target = 100000, theme }: { curre
         <div className="w-full relative pt-2">
             <div className="flex mb-3 items-center justify-between">
                 <div>
-                    <span className={`text-xs font-bold uppercase tracking-widest ${textClass}`}>
+                    <span className={`text-xs font-bold uppercase tracking-widest transition-none ${textClass}`}>
                         İlerleme
                     </span>
                 </div>
                 <div className="text-right">
-                    <span className={`text-sm font-bold ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`text-sm font-bold transition-none ${theme === 'oled' ? 'text-white' : 'text-slate-900'}`}>
                         {realPercentage}%
                     </span>
                 </div>
@@ -35,9 +35,9 @@ export default function ProgressBar({ current, target = 100000, theme }: { curre
                 <div className="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none rounded-full" />
             </div>
             <div className="flex justify-between text-sm opacity-80 font-mono tracking-tighter">
-                <span>0</span>
-                <span className={`font-bold text-base ${current >= target ? 'text-emerald-400' : 'text-red-400'}`}>Kalan: {Math.max(0, target - current).toLocaleString()}</span>
-                <span>{target.toLocaleString()}</span>
+                <span className="transition-none">0</span>
+                <span className={`font-bold text-base transition-none ${current >= target ? 'text-emerald-400' : 'text-red-400'}`}>Kalan: {Math.max(0, target - current).toLocaleString()}</span>
+                <span className="transition-none">{target.toLocaleString()}</span>
             </div>
         </div>
     );
