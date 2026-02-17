@@ -106,7 +106,7 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className={`p-5 rounded-2xl border space-y-3 transition-colors duration-500 ${containerClass}`}
+            className={`p-5 rounded-2xl border space-y-3 ${containerClass}`}
         >
             <form onSubmit={handleSubmit} className="space-y-3">
                 <div className="flex gap-3">
