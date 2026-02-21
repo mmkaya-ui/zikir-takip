@@ -24,8 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     manifest: "/manifest.json",
     icons: {
-      icon: "/favicon.svg",
-      apple: "/icons/apple-touch-icon.png",
+      icon: "/icon.png",
+      apple: "/icon.png",
     },
     appleWebApp: {
       capable: true,
@@ -54,8 +54,8 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="icon" href="/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/icon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
