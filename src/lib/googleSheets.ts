@@ -2,12 +2,10 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 
 // Config variables
-// Config variables
 const SPREADSHEET_ID = process.env.GOOGLE_SPREADSHEET_ID;
 // Support both variable names to be safe
 const GOOGLE_CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL || process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 
-// Robust Private Key Parser
 // Robust Private Key Parser
 const getPrivateKey = () => {
   const key = process.env.GOOGLE_PRIVATE_KEY;
@@ -37,13 +35,6 @@ const getPrivateKey = () => {
 
 const GOOGLE_PRIVATE_KEY = getPrivateKey();
 
-// Initialize auth - using JWT for server-side auth
-// Moved inside getDoc to be stateless
-// const serviceAccountAuth = ...
-
-// Removed global doc variable to prevent stale data/headers in serverless warm starts
-// let doc: GoogleSpreadsheet | null = null;
-
 export async function getDoc() {
   // Always create valid auth
   const serviceAccountAuth = new JWT({
@@ -69,9 +60,85 @@ export async function getDoc() {
   }
 }
 
-export async function getSheet() {
-  const doc = await getDoc();
-  const effectiveDate = getEffectiveDate();
+export type DynamicSettings = {
+  dhikrName: string;
+  target: number;
+  resetHour: number;
+};
+
+export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettings> {
+  const settingsTabTitle = 'Ayarlar';
+  let sheet = doc.sheetsByTitle[settingsTabTitle];
+
+  // Default values
+  let target = 100000;
+  let resetHour = 22;
+
+  if (!sheet) {
+    // Yoksa yeni tab oluştur
+    sheet = await doc.addSheet({
+      title: settingsTabTitle,
+      headerValues: ['Ayar Adı', 'Değer', 'Açıklama'],
+      gridProperties: {
+         rowCount: 50,
+         columnCount: 3
+      }
+    });
+
+    await sheet.addRows([
+      { 'Ayar Adı': 'Hedef', 'Değer': target, 'Açıklama': 'Günlük zikir hedefi (Sayısal)' },
+      { 'Ayar Adı': 'Sıfırlama Saati', 'Değer': resetHour, 'Açıklama': 'Günlük sıfırlanma saati (örn: 22)' }
+    ]);
+  } else {
+    // Olan ayarları oku
+    const rows = await sheet.getRows();
+    rows.forEach(row => {
+      const ayarAdi = row.get('Ayar Adı');
+      const deger = row.get('Değer');
+      if (ayarAdi === 'Hedef' && deger) {
+        const parsedTarget = parseInt(deger, 10);
+        if (!isNaN(parsedTarget)) target = parsedTarget;
+      }
+      if (ayarAdi === 'Sıfırlama Saati' && deger) {
+        const parsedHour = parseInt(deger, 10);
+        if (!isNaN(parsedHour) && parsedHour >= 0 && parsedHour <= 23) {
+            resetHour = parsedHour;
+        }
+      }
+    });
+  }
+
+  // Fallback to "İhlas-ı Şerif" if doc title is missing or empty
+  const dhikrName = doc.title || 'İhlas-ı Şerif';
+
+  return { target, resetHour, dhikrName };
+}
+
+// Helper to get "Effective Date" string YYYY-MM-DD
+// Logic: Always use Turkey Time (Europe/Istanbul).
+// If TRT hour is >= resetHour, it counts as "tomorrow".
+export function getEffectiveDate(resetHour: number): string {
+  // 1. Get current time in Turkey
+  const trtNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
+
+  // 2. Check hour in TRT
+  const hour = trtNow.getHours();
+
+  // 3. If >= resetHour, move to next day
+  if (hour >= resetHour) {
+    trtNow.setDate(trtNow.getDate() + 1);
+  }
+
+  // 4. Return YYYY-MM-DD format
+  const year = trtNow.getFullYear();
+  const month = String(trtNow.getMonth() + 1).padStart(2, '0');
+  const day = String(trtNow.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
+  const effectiveDate = getEffectiveDate(resetHour);
 
   // Bugünün tarihiyle sheet tab'ı var mı?
   let sheet = doc.sheetsByTitle[effectiveDate];
@@ -95,29 +162,6 @@ export async function getSheet() {
   return sheet;
 }
 
-// Helper to get "Effective Date" string YYYY-MM-DD
-// Logic: Always use Turkey Time (Europe/Istanbul).
-// If TRT hour is >= 22:00, it counts as "tomorrow".
-export function getEffectiveDate(): string {
-  // 1. Get current time in Turkey
-  const trtNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
-
-  // 2. Check hour in TRT
-  const hour = trtNow.getHours();
-
-  // 3. If >= 22:00, move to next day
-  if (hour >= 22) {
-    trtNow.setDate(trtNow.getDate() + 1);
-  }
-
-  // 4. Return YYYY-MM-DD format
-  const year = trtNow.getFullYear();
-  const month = String(trtNow.getMonth() + 1).padStart(2, '0');
-  const day = String(trtNow.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-}
-
 export type Reading = {
   name: string;
   count: number;
@@ -126,8 +170,10 @@ export type Reading = {
 }
 
 export async function addReading(name: string, count: number) {
-  const sheet = await getSheet();
-  const date = getEffectiveDate();
+  const doc = await getDoc();
+  const settings = await getSettings(doc);
+  const sheet = await getSheet(doc, settings.resetHour);
+  const date = getEffectiveDate(settings.resetHour);
   const timestamp = new Date().toISOString();
 
   await sheet.addRow({
@@ -138,9 +184,11 @@ export async function addReading(name: string, count: number) {
   });
 }
 
-export async function getDailyTotal(): Promise<{ total: number, date: string, userCounts: Record<string, number> }> {
-  const sheet = await getSheet();
-  const effectiveDate = getEffectiveDate();
+export async function getDailyTotal(): Promise<{ total: number, date: string, userCounts: Record<string, number>, settings: DynamicSettings }> {
+  const doc = await getDoc();
+  const settings = await getSettings(doc);
+  const sheet = await getSheet(doc, settings.resetHour);
+  const effectiveDate = getEffectiveDate(settings.resetHour);
 
   // G2 hücresindeki SUM formülünü oku — bu sheet sadece bugünün verilerini içerir
   await sheet.loadCells('G2');
@@ -172,6 +220,6 @@ export async function getDailyTotal(): Promise<{ total: number, date: string, us
     total = calculatedTotal;
   }
 
-  return { total, date: effectiveDate, userCounts };
+  return { total, date: effectiveDate, userCounts, settings };
 }
 

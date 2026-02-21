@@ -32,6 +32,10 @@ export default function Home() {
   const total = data?.total || 0;
   const userCounts = data?.userCounts || {};
 
+  const target = data?.settings?.target || 100000;
+  const dhikrName = data?.settings?.dhikrName || 'İhlas-ı Şerif';
+  const resetHour = data?.settings?.resetHour ?? 22;
+
   const dateStr = data?.date;
   const formattedDate = dateStr ? new Date(dateStr).toLocaleDateString('tr-TR', {
     day: 'numeric',
@@ -118,7 +122,7 @@ export default function Home() {
 
           <motion.div>
             <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
-              İhlas-ı Şerif
+              {dhikrName}
             </h1>
             <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1 transition-none`}>
               {formattedDate}
@@ -169,7 +173,7 @@ export default function Home() {
                 )}
               </div>
 
-              <ProgressBar current={total} target={100000} theme={theme} />
+              <ProgressBar current={total} target={target} theme={theme} />
             </>
           )}
         </motion.div>
@@ -198,7 +202,7 @@ export default function Home() {
         {/* Footer with Help Button - tight below form */}
         <div className="text-center shrink-0 flex flex-col items-center gap-2 mt-2">
           <div className="text-xs font-bold opacity-60 uppercase tracking-widest transition-none">
-            Her gün Türkiye saati 22:00{"'"}da sıfırlanır
+            Her gün Türkiye saati {String(resetHour).padStart(2, '0')}:00{"'"}da sıfırlanır
           </div>
 
           <button

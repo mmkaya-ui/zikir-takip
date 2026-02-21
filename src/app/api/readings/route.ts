@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
-import { addReading, getDailyTotal } from '../../../lib/googleSheets';
+import { addReading, getDailyTotal, DynamicSettings } from '../../../lib/googleSheets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 // --- Cache + Dedup Layer ---
 const CACHE_TTL_MS = 5000; // 5 saniye (User requested)
-let cachedData: { total: number; date: string; userCounts: Record<string, number> } | null = null;
+let cachedData: { total: number; date: string; userCounts: Record<string, number>; settings: DynamicSettings } | null = null;
 let cacheTimestamp = 0;
-let inflightRequest: Promise<{ total: number; date: string; userCounts: Record<string, number> }> | null = null;
+let inflightRequest: Promise<{ total: number; date: string; userCounts: Record<string, number>; settings: DynamicSettings }> | null = null;
 
 async function getCachedDailyTotal() {
     // 1. Cache hâlâ taze mi?
@@ -52,6 +52,7 @@ export async function GET() {
         return NextResponse.json({
             total: 0,
             date: new Date().toISOString().split('T')[0],
+            settings: { target: 100000, resetHour: 22, dhikrName: 'İhlas-ı Şerif' },
             error: isCredentialError ? 'Setup Required' : 'Overloaded'
         }, { status: 200 });
     }
