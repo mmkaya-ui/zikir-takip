@@ -4,9 +4,11 @@ interface HelpModalProps {
     isOpen: boolean;
     onClose: () => void;
     theme: string;
+    dhikrName?: string;
+    resetHour?: number;
 }
 
-export default function HelpModal({ isOpen, onClose, theme }: HelpModalProps) {
+export default function HelpModal({ isOpen, onClose, theme, dhikrName = 'Zikir', resetHour = 22 }: HelpModalProps) {
     if (!isOpen) return null;
 
     const isOled = theme === 'oled';
@@ -39,12 +41,12 @@ export default function HelpModal({ isOpen, onClose, theme }: HelpModalProps) {
                     <div className={`space-y-4 text-sm leading-relaxed ${isOled ? 'text-gray-300' : 'text-slate-600'}`}>
                         <p>
                             <span className="font-bold text-emerald-500 block mb-1">Ortak Kayıt Defteri 📖</span>
-                            Okuduğunuz İhlas-ı Şerifler, ortak bir dijital kayıt defterine otomatik olarak işlenir. Herkesin okumaları tek bir yerde toplanır.
+                            Okuduğunuz {dhikrName} adetleri, ortak bir dijital kayıt defterine otomatik olarak işlenir. Herkesin okumaları tek bir yerde toplanır.
                         </p>
 
                         <p>
                             <span className="font-bold text-emerald-500 block mb-1">Her Gece Yeni Sayfa 🌙</span>
-                            Her gece Türkiye saatiyle <strong>22:00</strong>{"'"}da o günün sayfası kapanır ve yeni bir sayfa açılır.
+                            Her gece Türkiye saatiyle <strong>{String(resetHour).padStart(2, '0')}:00</strong>{"'"}da o günün sayfası kapanır ve yeni bir sayfa açılır.
                         </p>
 
                         <p>

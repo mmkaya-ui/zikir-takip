@@ -81,7 +81,7 @@ export default function Home() {
         )}
       </div>
 
-      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} />
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} theme={theme} dhikrName={dhikrName} resetHour={resetHour} />
 
       <motion.div
         initial={{ opacity: 0 }}

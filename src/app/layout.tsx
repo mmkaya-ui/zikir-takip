@@ -4,20 +4,36 @@ import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "İhlas Takip",
-  description: "Günlük İhlas-ı Şerif Okuma Takibi",
-  manifest: "/manifest.json",
-  icons: {
-    icon: "/favicon.svg",
-    apple: "/icons/apple-touch-icon.png",
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "İhlas Takip",
-  },
-};
+import { getDoc, getSettings } from "../lib/googleSheets";
+
+export async function generateMetadata(): Promise<Metadata> {
+  let title = "Zikir Takip";
+  let description = "Günlük Zikir Okuma Takibi";
+
+  try {
+    const doc = await getDoc();
+    const settings = await getSettings(doc);
+    title = settings.dhikrName;
+    description = `${title} Okuma Takibi`;
+  } catch (error) {
+    console.error("Metadata fetch error:", error);
+  }
+
+  return {
+    title,
+    description,
+    manifest: "/manifest.json",
+    icons: {
+      icon: "/favicon.svg",
+      apple: "/icons/apple-touch-icon.png",
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: title,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0f172a",

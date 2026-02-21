@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-export const alt = 'İhlas Takip';
+export const alt = 'Zikir Takip';
 export const size = {
     width: 1200,
     height: 630,
@@ -86,7 +86,7 @@ export default async function Image() {
                     textShadow: '0 4px 20px rgba(0,0,0,0.5)',
                     letterSpacing: '-2px',
                 }}>
-                    İHLAS TAKİP
+                    ZİKİR TAKİP
                 </div>
 
                 <div style={{

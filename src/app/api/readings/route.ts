@@ -52,7 +52,7 @@ export async function GET() {
         return NextResponse.json({
             total: 0,
             date: new Date().toISOString().split('T')[0],
-            settings: { target: 100000, resetHour: 22, dhikrName: 'İhlas-ı Şerif' },
+            settings: { target: 100000, resetHour: 22, dhikrName: 'Zikir Takip' },
             error: isCredentialError ? 'Setup Required' : 'Overloaded'
         }, { status: 200 });
     }
