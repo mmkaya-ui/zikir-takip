@@ -33,7 +33,7 @@ export default function Home() {
   const userCounts = data?.userCounts || {};
 
   const target = data?.settings?.target || 100000;
-  const dhikrName = data?.settings?.dhikrName || 'Zikir Takip';
+  const dhikrName = data?.settings?.dhikrName || '';
   const resetHour = data?.settings?.resetHour ?? 22;
 
   const dateStr = data?.date;
@@ -122,10 +122,18 @@ export default function Home() {
 
           <motion.div>
             <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
-              {dhikrName}
+              {loading ? (
+                <span className={`inline-block h-10 w-48 rounded-lg animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
+              ) : (
+                dhikrName || 'Zikir Takip'
+              )}
             </h1>
             <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1 transition-none`}>
-              {formattedDate}
+              {loading ? (
+                <span className={`inline-block h-4 w-32 rounded animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
+              ) : (
+                formattedDate
+              )}
             </p>
           </motion.div>
         </div>
