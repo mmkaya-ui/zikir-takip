@@ -80,8 +80,8 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
       title: settingsTabTitle,
       headerValues: ['Ayar Adı', 'Değer', 'Açıklama'],
       gridProperties: {
-         rowCount: 50,
-         columnCount: 3
+        rowCount: 50,
+        columnCount: 3
       }
     });
 
@@ -102,14 +102,14 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
       if (ayarAdi === 'Sıfırlama Saati' && deger) {
         const parsedHour = parseInt(deger, 10);
         if (!isNaN(parsedHour) && parsedHour >= 0 && parsedHour <= 23) {
-            resetHour = parsedHour;
+          resetHour = parsedHour;
         }
       }
     });
   }
 
-  // Fallback to "İhlas-ı Şerif" if doc title is missing or empty
-  const dhikrName = doc.title || 'İhlas-ı Şerif';
+  // Fallback to "Zikir Takip" if doc title is missing or empty
+  const dhikrName = doc.title || 'Zikir Takip';
 
   return { target, resetHour, dhikrName };
 }
