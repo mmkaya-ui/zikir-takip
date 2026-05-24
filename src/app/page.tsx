@@ -211,7 +211,7 @@ export default function Home() {
         <div className="text-center shrink-0 flex flex-col items-center gap-2 mt-2">
           <div className="text-xs font-bold opacity-60 uppercase tracking-widest transition-none">
             Her gün Türkiye saati {String(resetHour).padStart(2, '0')}:00{"'"}{
-              {0:'da',1:'de',2:'de',3:'te',4:'te',5:'te',6:'da',7:'de',8:'de',9:'da',10:'da',11:'de',12:'de',13:'te',14:'te',15:'te',16:'da',17:'de',18:'de',19:'da',20:'de',21:'de',22:'de',23:'te'}[resetHour] || 'da'
+              ({0:'da',1:'de',2:'de',3:'te',4:'te',5:'te',6:'da',7:'de',8:'de',9:'da',10:'da',11:'de',12:'de',13:'te',14:'te',15:'te',16:'da',17:'de',18:'de',19:'da',20:'de',21:'de',22:'de',23:'te'} as Record<number, string>)[Number(resetHour)] || 'da'
             } sıfırlanır
           </div>
 
