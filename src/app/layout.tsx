@@ -4,36 +4,19 @@ import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
-import { getDoc, getSettings } from "../lib/googleSheets";
-
-export async function generateMetadata(): Promise<Metadata> {
-  let title = "Zikir Takip";
-  let description = "Günlük Zikir Okuma Takibi";
-
-  try {
-    const doc = await getDoc();
-    const settings = await getSettings(doc);
-    title = settings.dhikrName;
-    description = `${title} Okuma Takibi`;
-  } catch (error) {
-    console.error("Metadata fetch error:", error);
-  }
-
-  return {
-    title,
-    description,
-    icons: {
-      icon: "/icon.png",
-      apple: "/icon.png",
-    },
-    appleWebApp: {
-      capable: true,
-      statusBarStyle: "black-translucent",
-      title: title,
-    },
-  };
-}
-
+export const metadata: Metadata = {
+  title: "Zikir Takip",
+  description: "Günlük Zikir Okuma Takibi",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Zikir Takip",
+  },
+};
 export const viewport: Viewport = {
   themeColor: "#0f172a",
   width: "device-width",

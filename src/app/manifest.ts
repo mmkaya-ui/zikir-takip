@@ -1,23 +1,10 @@
 import { MetadataRoute } from 'next';
-import { getDoc, getSettings } from '../lib/googleSheets';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-export default async function manifest(): Promise<MetadataRoute.Manifest> {
-    let title = "Zikir Takip";
-    try {
-        const doc = await getDoc();
-        const settings = await getSettings(doc);
-        title = settings.dhikrName;
-    } catch (e) {
-        console.error("Manifest fetch error:", e);
-    }
-
+export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: title,
-        short_name: title,
-        description: `${title} Takip Uygulaması`,
+        name: 'Zikir Takip',
+        short_name: 'Zikir Takip',
+        description: 'Zikir Takip Uygulaması',
         start_url: '/',
         display: 'standalone',
         background_color: '#0f172a',

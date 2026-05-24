@@ -28,14 +28,6 @@ export default function Home() {
     if (saved) setUserName(saved);
   }, [data]);
 
-  const dhikrName = data?.settings?.dhikrName || '';
-
-  useEffect(() => {
-    if (dhikrName) {
-      document.title = dhikrName;
-    }
-  }, [dhikrName]);
-
   const loading = !data && !error;
   const total = data?.total || 0;
   const userCounts = data?.userCounts || {};
