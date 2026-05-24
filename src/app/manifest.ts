@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
 import { getDoc, getSettings } from '../lib/googleSheets';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
     let title = "Zikir Takip";
     try {
