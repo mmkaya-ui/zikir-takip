@@ -33,6 +33,7 @@ export default function Home() {
   const userCounts = data?.userCounts || {};
 
   const target = data?.settings?.target || 100000;
+  const dhikrName = data?.settings?.dhikrName || '';
   const resetHour = data?.settings?.resetHour ?? 22;
 
   const dateStr = data?.date;
