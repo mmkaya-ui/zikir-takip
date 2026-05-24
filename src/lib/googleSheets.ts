@@ -73,6 +73,7 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
   // Default values
   let target = 100000;
   let resetHour = 22;
+  let dhikrName = doc.title || 'Zikir Takip';
 
   if (!sheet) {
     // Yoksa yeni tab oluştur
@@ -87,7 +88,8 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
 
     await sheet.addRows([
       { 'Ayar Adı': 'Hedef', 'Değer': target, 'Açıklama': 'Günlük zikir hedefi (Sayısal)' },
-      { 'Ayar Adı': 'Sıfırlama Saati', 'Değer': resetHour, 'Açıklama': 'Günlük sıfırlanma saati (örn: 22)' }
+      { 'Ayar Adı': 'Sıfırlama Saati', 'Değer': resetHour, 'Açıklama': 'Günlük sıfırlanma saati (örn: 22)' },
+      { 'Ayar Adı': 'Zikir Adı', 'Değer': dhikrName, 'Açıklama': 'Ekranda görünecek zikir adı (Örn: Kevser)' }
     ]);
   } else {
     // Olan ayarları oku
@@ -105,11 +107,11 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
           resetHour = parsedHour;
         }
       }
+      if (ayarAdi === 'Zikir Adı' && deger) {
+        dhikrName = String(deger);
+      }
     });
   }
-
-  // Fallback to "Zikir Takip" if doc title is missing or empty
-  const dhikrName = doc.title || 'Zikir Takip';
 
   return { target, resetHour, dhikrName };
 }
