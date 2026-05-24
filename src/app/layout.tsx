@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: "Zikir Takip",
   description: "Günlük Zikir Okuma Takibi",
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
+    icon: "/icon.png?v=3",
+    apple: "/icon.png?v=3",
   },
   appleWebApp: {
     capable: true,
@@ -36,8 +36,8 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
-        <link rel="icon" href="/icon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icon.png" />
+        <link rel="icon" href="/icon.png?v=3" type="image/png" />
+        <link rel="apple-touch-icon" href="/icon.png?v=3" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
