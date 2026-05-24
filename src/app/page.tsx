@@ -121,18 +121,7 @@ export default function Home() {
             )}
           </button>
 
-          <motion.div className="flex flex-col items-center">
-            <div className={`mb-3 flex-shrink-0 rounded-[2rem] overflow-hidden border-2 ${theme === 'oled' ? 'border-white/10 shadow-[0_0_40px_rgba(16,185,129,0.15)]' : 'border-emerald-100 shadow-[0_8px_30px_rgba(16,185,129,0.2)]'}`}>
-              <Image 
-                src="/icon.png" 
-                alt="Zikir Takip Logo" 
-                width={120} 
-                height={120} 
-                quality={100}
-                priority 
-                className="object-cover"
-              />
-            </div>
+          <motion.div>
             <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
               {loading ? (
                 <span className={`inline-block h-10 w-48 rounded-lg animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
