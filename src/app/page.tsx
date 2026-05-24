@@ -28,12 +28,19 @@ export default function Home() {
     if (saved) setUserName(saved);
   }, [data]);
 
+  const dhikrName = data?.settings?.dhikrName || '';
+
+  useEffect(() => {
+    if (dhikrName) {
+      document.title = dhikrName;
+    }
+  }, [dhikrName]);
+
   const loading = !data && !error;
   const total = data?.total || 0;
   const userCounts = data?.userCounts || {};
 
   const target = data?.settings?.target || 100000;
-  const dhikrName = data?.settings?.dhikrName || '';
   const resetHour = data?.settings?.resetHour ?? 22;
 
   const dateStr = data?.date;
