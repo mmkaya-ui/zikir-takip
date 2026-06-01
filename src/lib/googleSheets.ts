@@ -208,14 +208,6 @@ export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
       title: effectiveDate,
       headerValues: ['Tarih', 'İsim', 'Adet', 'Zaman', 'Zikir Türü'],
     });
-
-    // G1'e label, G2'ye SUM formülü ekle (Eski sistem uyumluluğu için, ama API hesaplamayı js'de yapacak)
-    await sheet.loadCells('G1:G2');
-    const g1 = sheet.getCellByA1('G1');
-    const g2 = sheet.getCellByA1('G2');
-    g1.value = 'Toplam';
-    g2.formula = '=SUM(C2:C10000)';
-    await sheet.saveUpdatedCells();
   } else {
     // Eğer sheet zaten varsa (eski sistemden kalmışsa), "Zikir Türü" başlığını kontrol et ve ekle.
     try {
