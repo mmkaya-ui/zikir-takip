@@ -105,7 +105,7 @@ export default function Home() {
         className="w-full max-w-sm flex flex-col relative z-10 gap-3"
       >
         {/* Header Section */}
-        <div className="text-center space-y-0.5 relative shrink-0 pt-2">
+        <div className="text-center space-y-0.5 relative shrink-0 pt-2 px-11 sm:px-12">
           {/* Quick Font Size Toggle */}
           <button
             onClick={cycleFontSize}
