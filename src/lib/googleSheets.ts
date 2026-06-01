@@ -209,13 +209,13 @@ export async function getSheet(doc: GoogleSpreadsheet, settings: DynamicSettings
       headerValues: ['Tarih', 'İsim', 'Adet', 'Zaman', 'Zikir Türü'],
     });
 
-    // Add dynamic Toplam formulas starting from column J
+    // Add dynamic Toplam formulas starting from column F
     if (settings.dhikrs && settings.dhikrs.length > 0) {
-      const cols = ['J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+      const cols = ['F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
       const maxDhikrs = Math.min(settings.dhikrs.length, cols.length);
       const endCol = cols[maxDhikrs - 1];
       
-      await sheet.loadCells(`J1:${endCol}2`);
+      await sheet.loadCells(`F1:${endCol}2`);
       
       for (let i = 0; i < maxDhikrs; i++) {
         const dhikr = settings.dhikrs[i];
