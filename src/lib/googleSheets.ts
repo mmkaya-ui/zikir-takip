@@ -35,7 +35,23 @@ const getPrivateKey = () => {
 
 const GOOGLE_PRIVATE_KEY = getPrivateKey();
 
+// --- Memory Caching to prevent Google Sheets 429 Rate Limits ---
+const CACHE_TTL_MS = 60 * 1000; // 1 minute
+
+let cachedDoc: GoogleSpreadsheet | null = null;
+let docCacheTime = 0;
+
+let cachedSettings: DynamicSettings | null = null;
+let settingsCacheTime = 0;
+
+let cachedSheet: any = null;
+let sheetCacheTime = 0;
+let lastSheetDate = '';
+
 export async function getDoc() {
+  if (cachedDoc && Date.now() - docCacheTime < CACHE_TTL_MS) {
+    return cachedDoc;
+  }
   // Always create valid auth
   const serviceAccountAuth = new JWT({
     email: GOOGLE_CLIENT_EMAIL,
@@ -53,6 +69,8 @@ export async function getDoc() {
   try {
     const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
     await doc.loadInfo();
+    cachedDoc = doc;
+    docCacheTime = Date.now();
     return doc;
   } catch (error) {
     console.error('❌ Google Sheets Connection Failed:', error);
@@ -72,6 +90,10 @@ export type DynamicSettings = {
 };
 
 export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettings> {
+  if (cachedSettings && Date.now() - settingsCacheTime < CACHE_TTL_MS) {
+    return cachedSettings;
+  }
+
   const settingsTabTitle = 'Ayarlar';
   let sheet = doc.sheetsByTitle[settingsTabTitle];
 
@@ -97,7 +119,7 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
   } else {
     // Olan ayarları oku
     const rows = await sheet.getRows();
-    rows.forEach(row => {
+    rows.forEach((row: any) => {
       const ayarAdi = String(row.get('Ayar Adı') || '').trim();
       const deger = row.get('Değer');
       
@@ -141,7 +163,10 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
 
   const dhikrs = Array.from(dhikrsMap.values()).sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-  return { dhikrs, resetHour };
+  cachedSettings = { dhikrs, resetHour };
+  settingsCacheTime = Date.now();
+
+  return cachedSettings;
 }
 
 // Helper to get "Effective Date" string YYYY-MM-DD
@@ -170,6 +195,10 @@ export function getEffectiveDate(resetHour: number): string {
 export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
   const effectiveDate = getEffectiveDate(resetHour);
 
+  if (cachedSheet && lastSheetDate === effectiveDate && Date.now() - sheetCacheTime < CACHE_TTL_MS) {
+    return cachedSheet;
+  }
+
   // Bugünün tarihiyle sheet tab'ı var mı?
   let sheet = doc.sheetsByTitle[effectiveDate];
 
@@ -189,6 +218,10 @@ export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
     await sheet.saveUpdatedCells();
   }
 
+  cachedSheet = sheet;
+  lastSheetDate = effectiveDate;
+  sheetCacheTime = Date.now();
+
   return sheet;
 }
 
@@ -206,17 +239,6 @@ export async function addReading(name: string, count: number, dhikrId: string = 
   const sheet = await getSheet(doc, settings.resetHour);
   const date = getEffectiveDate(settings.resetHour);
   const timestamp = new Date().toISOString();
-
-  // Ensure header has "Zikir Türü" if it's an old sheet
-  try {
-     await sheet.loadHeaderRow();
-     if (!sheet.headerValues.includes('Zikir Türü')) {
-         const newHeaders = [...sheet.headerValues, 'Zikir Türü'];
-         await sheet.setHeaderRow(newHeaders);
-     }
-  } catch(e) {
-     // Ignore header errors for empty sheets
-  }
 
   await sheet.addRow({
     'Tarih': `'${date}`,
@@ -248,7 +270,7 @@ export async function getDailyTotal(): Promise<{
       userCounts[d.id] = {};
   });
 
-  rows.forEach(row => {
+  rows.forEach((row: any) => {
     const countVal = row.get('Adet');
     const count = parseInt(countVal || '0', 10);
     const name = row.get('İsim') || 'Anonim';
