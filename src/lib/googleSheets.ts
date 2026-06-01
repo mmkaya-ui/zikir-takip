@@ -192,8 +192,8 @@ export function getEffectiveDate(resetHour: number): string {
   return `${year}-${month}-${day}`;
 }
 
-export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
-  const effectiveDate = getEffectiveDate(resetHour);
+export async function getSheet(doc: GoogleSpreadsheet, settings: DynamicSettings) {
+  const effectiveDate = getEffectiveDate(settings.resetHour);
 
   if (cachedSheet && lastSheetDate === effectiveDate && Date.now() - sheetCacheTime < CACHE_TTL_MS) {
     return cachedSheet;
@@ -208,6 +208,27 @@ export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
       title: effectiveDate,
       headerValues: ['Tarih', 'İsim', 'Adet', 'Zaman', 'Zikir Türü'],
     });
+
+    // Add dynamic Toplam formulas starting from column J
+    if (settings.dhikrs && settings.dhikrs.length > 0) {
+      const cols = ['J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+      const maxDhikrs = Math.min(settings.dhikrs.length, cols.length);
+      const endCol = cols[maxDhikrs - 1];
+      
+      await sheet.loadCells(`J1:${endCol}2`);
+      
+      for (let i = 0; i < maxDhikrs; i++) {
+        const dhikr = settings.dhikrs[i];
+        const colLetter = cols[i];
+        const headerCell = sheet.getCellByA1(`${colLetter}1`);
+        const formulaCell = sheet.getCellByA1(`${colLetter}2`);
+        
+        headerCell.value = `Toplam Zikir ${dhikr.id}`;
+        // E is Zikir Türü, C is Adet
+        formulaCell.formula = `=SUMIF(E2:E10000, "${dhikr.id}", C2:C10000)`;
+      }
+      await sheet.saveUpdatedCells();
+    }
   } else {
     // Eğer sheet zaten varsa (eski sistemden kalmışsa), "Zikir Türü" başlığını kontrol et ve ekle.
     try {
@@ -239,7 +260,7 @@ export type Reading = {
 export async function addReading(name: string, count: number, dhikrId: string = '1') {
   const doc = await getDoc();
   const settings = await getSettings(doc);
-  const sheet = await getSheet(doc, settings.resetHour);
+  const sheet = await getSheet(doc, settings);
   const date = getEffectiveDate(settings.resetHour);
   const timestamp = new Date().toISOString();
 
@@ -260,7 +281,7 @@ export async function getDailyTotal(): Promise<{
 }> {
   const doc = await getDoc();
   const settings = await getSettings(doc);
-  const sheet = await getSheet(doc, settings.resetHour);
+  const sheet = await getSheet(doc, settings);
   const effectiveDate = getEffectiveDate(settings.resetHour);
 
   const rows = await sheet.getRows();
