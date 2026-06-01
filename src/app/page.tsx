@@ -161,7 +161,7 @@ export default function Home() {
 
         {/* Dhikr Tabs (Pills) */}
         {!loading && dhikrs.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x shrink-0 justify-center">
+          <div className="flex gap-2 overflow-x-auto py-1 px-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x shrink-0">
             {dhikrs.map((d) => (
               <button
                 key={d.id}
