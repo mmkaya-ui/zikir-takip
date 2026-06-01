@@ -26,7 +26,7 @@ export default function HelpModal({ isOpen, onClose, theme, dhikrName = 'Zikir',
                 onClick={onClose}
             >
                 <div
-                    className={`${bgColor} ${borderColor} border w-full max-w-sm rounded-2xl p-6 shadow-2xl relative overflow-hidden`}
+                    className={`${bgColor} ${borderColor} border w-full max-w-sm rounded-2xl p-6 shadow-2xl relative overflow-y-auto max-h-[85vh] overscroll-contain`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
