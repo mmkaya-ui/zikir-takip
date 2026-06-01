@@ -17,9 +17,9 @@ export default function Home() {
   const [userName, setUserName] = useState('');
   const [activeDhikrId, setActiveDhikrId] = useState<string>('1');
 
-  // Poll every 25 seconds to save battery/memory on mobile
+  // Poll every 3 seconds to save battery/memory on mobile
   const { data, error, mutate } = useSWR('/api/readings', fetcher, {
-    refreshInterval: 25000,
+    refreshInterval: 3000,
     revalidateOnFocus: true,
     shouldRetryOnError: true,
     errorRetryInterval: 10000
