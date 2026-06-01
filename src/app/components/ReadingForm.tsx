@@ -25,6 +25,11 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
     const isNegative = count.trim().startsWith('-');
 
     const submitReading = async (forceConfirm = false) => {
+        // Haptic feedback for mobile devices
+        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(50); // 50ms light vibration
+        }
+
         if (!name || !count) return;
 
         const finalCount = parseInt(count);
