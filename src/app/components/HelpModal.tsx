@@ -52,6 +52,11 @@ export default function HelpModal({ isOpen, onClose, theme, dhikrName = 'Zikir',
                         </p>
 
                         <p>
+                            <span className="font-bold text-emerald-500 block mb-1">Farklı Zikirleri Takip Etme 📑</span>
+                            Üstteki sekmelerden (butonlardan) farklı zikirler arasında geçiş yapabilirsiniz. Her zikrin hedefi ve günlük toplamı birbirinden bağımsız olarak tutulur.
+                        </p>
+
+                        <p>
                             <span className="font-bold text-emerald-500 block mb-1">Geçmiş Kayıtlar Korunur 🗄️</span>
                             Önceki günlerde okuduklarınız asla silinmez, hepsi tarihli olarak arşivde muhafaza edilir. Sadece sayaç yeni gün için sıfırdan başlar.
                         </p>
