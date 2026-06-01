@@ -6,9 +6,9 @@ export const revalidate = 0;
 
 // --- Cache + Dedup Layer ---
 const CACHE_TTL_MS = 5000; // 5 saniye (User requested)
-let cachedData: { total: number; date: string; userCounts: Record<string, number>; settings: DynamicSettings } | null = null;
+let cachedData: { totals: Record<string, number>; date: string; userCounts: Record<string, Record<string, number>>; settings: DynamicSettings } | null = null;
 let cacheTimestamp = 0;
-let inflightRequest: Promise<{ total: number; date: string; userCounts: Record<string, number>; settings: DynamicSettings }> | null = null;
+let inflightRequest: Promise<{ totals: Record<string, number>; date: string; userCounts: Record<string, Record<string, number>>; settings: DynamicSettings }> | null = null;
 
 async function getCachedDailyTotal() {
     // 1. Cache hâlâ taze mi?
@@ -50,9 +50,10 @@ export async function GET() {
         const errMsg = error instanceof Error ? error.message : '';
         const isCredentialError = errMsg.includes('credentials are not set') || errMsg.includes('private key');
         return NextResponse.json({
-            total: 0,
+            totals: { '1': 0 },
+            userCounts: { '1': {} },
             date: new Date().toISOString().split('T')[0],
-            settings: { target: 100000, resetHour: 22, dhikrName: 'Zikir Takip' },
+            settings: { dhikrs: [{id: '1', name: 'Zikir Takip', target: 100000}], resetHour: 22 },
             error: isCredentialError ? 'Setup Required' : 'Overloaded'
         }, { status: 200 });
     }
@@ -61,7 +62,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, count, confirmCorrection } = body;
+        const { name, count, confirmCorrection, dhikrId = '1' } = body;
         let finalCount = parseInt(count, 10);
 
         if (!name || isNaN(finalCount)) {
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
         if (finalCount < 0) {
             // Fetch current totals to check credit
             const { userCounts } = await getDailyTotal();
-            const userCredit = userCounts[name] || 0;
+            const userCredit = userCounts[dhikrId]?.[name] || 0;
 
             // If user has no credit, they can't subtract anything.
             if (userCredit <= 0) {
@@ -109,7 +110,7 @@ export async function POST(request: Request) {
             }
         }
 
-        await addReading(name, finalCount);
+        await addReading(name, finalCount, dhikrId);
         invalidateCache(); // POST sonrası cache'i sıfırla → sonraki GET taze veri çeker
         return NextResponse.json({ success: true, adjusted: finalCount !== parseInt(count, 10) });
     } catch (error) {

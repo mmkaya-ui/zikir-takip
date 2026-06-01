@@ -2,20 +2,21 @@
 
 import useSWR from 'swr';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import ReadingForm from './components/ReadingForm';
 import ProgressBar from './components/ProgressBar';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from './context/SettingsContext';
 import HelpModal from './components/HelpModal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
-  const { theme, setTheme, fontScale, fontSize, setFontSize } = useSettings();
+  const { theme, setTheme, fontSize, setFontSize } = useSettings();
   const [showHelp, setShowHelp] = useState(false);
   const [showMyTotal, setShowMyTotal] = useState(false);
   const [userName, setUserName] = useState('');
+  const [activeDhikrId, setActiveDhikrId] = useState<string>('1');
+
   // Poll every 25 seconds to save battery/memory on mobile
   const { data, error, mutate } = useSWR('/api/readings', fetcher, {
     refreshInterval: 25000,
@@ -24,17 +25,28 @@ export default function Home() {
     errorRetryInterval: 10000
   });
 
+  const dhikrs: {id: string, name: string, target: number}[] = data?.settings?.dhikrs || [{ id: '1', name: 'Yükleniyor...', target: 100000 }];
+
   useEffect(() => {
     const saved = localStorage.getItem('userName');
     if (saved) setUserName(saved);
   }, [data]);
 
-  const loading = !data && !error;
-  const total = data?.total || 0;
-  const userCounts = data?.userCounts || {};
+  // If the active dhikr is deleted or we loaded new data and it's missing, fallback to the first one
+  useEffect(() => {
+    if (data?.settings?.dhikrs && !data.settings.dhikrs.find((d: any) => d.id === activeDhikrId)) {
+        setActiveDhikrId(data.settings.dhikrs[0].id);
+    }
+  }, [data, activeDhikrId]);
 
-  const target = data?.settings?.target || 100000;
-  const dhikrName = data?.settings?.dhikrName || '';
+  const loading = !data && !error;
+  
+  const activeDhikr = dhikrs.find(d => d.id === activeDhikrId) || dhikrs[0];
+  const total = data?.totals?.[activeDhikrId] || 0;
+  const userCounts = data?.userCounts?.[activeDhikrId] || {};
+
+  const target = activeDhikr.target;
+  const dhikrName = activeDhikr.name;
   const resetHour = data?.settings?.resetHour ?? 22;
 
   const dateStr = data?.date;
@@ -91,7 +103,7 @@ export default function Home() {
       >
         {/* Header Section */}
         <div className="text-center space-y-0.5 relative shrink-0 pt-2">
-          {/* Quick Font Size Toggle (Left) - Was Right */}
+          {/* Quick Font Size Toggle */}
           <button
             onClick={cycleFontSize}
             className={`absolute left-0 top-1/2 -translate-y-1/2 w-[42px] h-[42px] flex items-center justify-center rounded-full transition-all active:scale-95 border ${theme === 'oled'
@@ -105,7 +117,7 @@ export default function Home() {
             </span>
           </button>
 
-          {/* Quick Theme Toggle (Right) - Was Left */}
+          {/* Quick Theme Toggle */}
           <button
             onClick={toggleTheme}
             className={`absolute right-0 top-1/2 -translate-y-1/2 p-2.5 rounded-full transition-all active:scale-95 border ${theme === 'oled'
@@ -121,23 +133,54 @@ export default function Home() {
             )}
           </button>
 
-          <motion.div>
-            <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
-              {loading ? (
-                <span className={`inline-block h-10 w-48 rounded-lg animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
-              ) : (
-                dhikrName || 'Zikir Takip'
-              )}
-            </h1>
-            <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1 transition-none`}>
-              {loading ? (
-                <span className={`inline-block h-4 w-32 rounded animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
-              ) : (
-                formattedDate
-              )}
-            </p>
-          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeDhikrId}
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              transition={{ duration: 0.15 }}
+            >
+              <h1 className={`text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${textGradient}`}>
+                {loading ? (
+                  <span className={`inline-block h-10 w-48 rounded-lg animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
+                ) : (
+                  dhikrName
+                )}
+              </h1>
+            </motion.div>
+          </AnimatePresence>
+          <p className={`text-sm font-bold tracking-widest uppercase opacity-80 mt-1 transition-none`}>
+            {loading ? (
+              <span className={`inline-block h-4 w-32 rounded animate-pulse ${theme === 'oled' ? 'bg-white/10' : 'bg-black/5'}`}></span>
+            ) : (
+              formattedDate
+            )}
+          </p>
         </div>
+
+        {/* Dhikr Tabs (Pills) */}
+        {!loading && dhikrs.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x shrink-0 justify-center">
+            {dhikrs.map((d) => (
+              <button
+                key={d.id}
+                onClick={() => setActiveDhikrId(d.id)}
+                className={`px-4 py-2 rounded-full font-bold text-sm whitespace-nowrap snap-center transition-all ${
+                  activeDhikrId === d.id
+                    ? theme === 'oled'
+                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                      : 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+                    : theme === 'oled'
+                      ? 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 shadow-sm'
+                }`}
+              >
+                {d.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {errorMessage && (
           <div className={`p-2 rounded-xl text-center text-xs font-semibold backdrop-blur-md shrink-0 border ${errorMessage === 'Setup Required' ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-amber-500/10 border-amber-500/50 text-amber-500'}`}>
@@ -147,6 +190,10 @@ export default function Home() {
 
         {/* Stats Card */}
         <motion.div
+          key={activeDhikrId}
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2 }}
           className={`rounded-2xl p-4 border backdrop-blur-md relative overflow-hidden group shrink-0 ${cardClass}`}
         >
           {loading ? (
@@ -190,14 +237,21 @@ export default function Home() {
         {/* Reading Form - Directly below stats card */}
         <div className="shrink-0 relative z-20">
           <ReadingForm
+            activeDhikrId={activeDhikrId}
             onAdd={(newData) => {
               if (newData && data) {
                 mutate({
                   ...data,
-                  total: newData.newTotal,
+                  totals: {
+                      ...(data.totals || {}),
+                      [activeDhikrId]: newData.newTotal
+                  },
                   userCounts: {
                     ...(data.userCounts || {}),
-                    [newData.name]: newData.newUserCount
+                    [activeDhikrId]: {
+                        ...(data.userCounts?.[activeDhikrId] || {}),
+                        [newData.name]: newData.newUserCount
+                    }
                   }
                 }, { revalidate: false });
               } else {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: string, newTotal: number, newUserCount: number }) => void, theme?: string }) {
+export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhikrId: string, onAdd: (data?: { name: string, newTotal: number, newUserCount: number }) => void, theme?: string }) {
     const [name, setName] = useState('');
     const [count, setCount] = useState('');
     const [loading, setLoading] = useState(false);
@@ -48,7 +48,8 @@ export default function ReadingForm({ onAdd, theme }: { onAdd: (data?: { name: s
                 body: JSON.stringify({
                     name,
                     count: finalCount,
-                    confirmCorrection: forceConfirm
+                    confirmCorrection: forceConfirm,
+                    dhikrId: activeDhikrId
                 }),
             });
 

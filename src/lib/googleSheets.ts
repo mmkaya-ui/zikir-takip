@@ -60,9 +60,14 @@ export async function getDoc() {
   }
 }
 
-export type DynamicSettings = {
-  dhikrName: string;
+export type DhikrDef = {
+  id: string;
+  name: string;
   target: number;
+};
+
+export type DynamicSettings = {
+  dhikrs: DhikrDef[];
   resetHour: number;
 };
 
@@ -70,10 +75,8 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
   const settingsTabTitle = 'Ayarlar';
   let sheet = doc.sheetsByTitle[settingsTabTitle];
 
-  // Default values
-  let target = 100000;
   let resetHour = 22;
-  let dhikrName = doc.title || 'Zikir Takip';
+  const dhikrsMap = new Map<string, DhikrDef>();
 
   if (!sheet) {
     // Yoksa yeni tab oluştur
@@ -87,33 +90,58 @@ export async function getSettings(doc: GoogleSpreadsheet): Promise<DynamicSettin
     });
 
     await sheet.addRows([
-      { 'Ayar Adı': 'Hedef', 'Değer': target, 'Açıklama': 'Günlük zikir hedefi (Sayısal)' },
-      { 'Ayar Adı': 'Sıfırlama Saati', 'Değer': resetHour, 'Açıklama': 'Günlük sıfırlanma saati (örn: 22)' },
-      { 'Ayar Adı': 'Zikir Adı', 'Değer': dhikrName, 'Açıklama': 'Ekranda görünecek zikir adı (Örn: Kevser)' }
+      { 'Ayar Adı': 'Zikir 1 Adı', 'Değer': doc.title || 'Zikir Takip', 'Açıklama': 'Ekranda görünecek 1. zikir adı' },
+      { 'Ayar Adı': 'Zikir 1 Hedef', 'Değer': 100000, 'Açıklama': '1. Zikir için günlük hedef' },
+      { 'Ayar Adı': 'Sıfırlama Saati', 'Değer': 22, 'Açıklama': 'Günlük sıfırlanma saati (örn: 22)' }
     ]);
   } else {
     // Olan ayarları oku
     const rows = await sheet.getRows();
     rows.forEach(row => {
-      const ayarAdi = row.get('Ayar Adı');
+      const ayarAdi = String(row.get('Ayar Adı') || '').trim();
       const deger = row.get('Değer');
-      if (ayarAdi === 'Hedef' && deger) {
-        const parsedTarget = parseInt(deger, 10);
-        if (!isNaN(parsedTarget)) target = parsedTarget;
-      }
+      
       if (ayarAdi === 'Sıfırlama Saati' && deger) {
         const parsedHour = parseInt(deger, 10);
         if (!isNaN(parsedHour) && parsedHour >= 0 && parsedHour <= 23) {
           resetHour = parsedHour;
         }
-      }
-      if (ayarAdi === 'Zikir Adı' && deger) {
-        dhikrName = String(deger);
+      } else if (ayarAdi === 'Hedef' && deger) { // Legacy fallback
+          const target = parseInt(deger, 10) || 100000;
+          if (!dhikrsMap.has('1')) dhikrsMap.set('1', { id: '1', name: 'Zikir Takip', target });
+          else dhikrsMap.get('1')!.target = target;
+      } else if (ayarAdi === 'Zikir Adı' && deger) { // Legacy fallback
+          const name = String(deger);
+          if (!dhikrsMap.has('1')) dhikrsMap.set('1', { id: '1', name, target: 100000 });
+          else dhikrsMap.get('1')!.name = name;
+      } else {
+        // Match Zikir X Adı or Zikir X Hedef
+        const nameMatch = ayarAdi.match(/Zikir\s+(\d+)\s+Ad[ıi]/i);
+        if (nameMatch && deger) {
+           const id = nameMatch[1];
+           if (!dhikrsMap.has(id)) dhikrsMap.set(id, { id, name: String(deger), target: 100000 });
+           else dhikrsMap.get(id)!.name = String(deger);
+        }
+        
+        const targetMatch = ayarAdi.match(/Zikir\s+(\d+)\s+Hedef/i);
+        if (targetMatch && deger) {
+           const id = targetMatch[1];
+           const target = parseInt(deger, 10) || 100000;
+           if (!dhikrsMap.has(id)) dhikrsMap.set(id, { id, name: `Zikir ${id}`, target });
+           else dhikrsMap.get(id)!.target = target;
+        }
       }
     });
   }
 
-  return { target, resetHour, dhikrName };
+  // Ensure at least one dhikr exists if it was empty
+  if (dhikrsMap.size === 0) {
+    dhikrsMap.set('1', { id: '1', name: doc.title || 'Zikir Takip', target: 100000 });
+  }
+
+  const dhikrs = Array.from(dhikrsMap.values()).sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
+  return { dhikrs, resetHour };
 }
 
 // Helper to get "Effective Date" string YYYY-MM-DD
@@ -149,10 +177,10 @@ export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
     // Yoksa yeni tab oluştur
     sheet = await doc.addSheet({
       title: effectiveDate,
-      headerValues: ['Tarih', 'İsim', 'Adet', 'Zaman'],
+      headerValues: ['Tarih', 'İsim', 'Adet', 'Zaman', 'Zikir Türü'],
     });
 
-    // G1'e label, G2'ye SUM formülü ekle
+    // G1'e label, G2'ye SUM formülü ekle (Eski sistem uyumluluğu için, ama API hesaplamayı js'de yapacak)
     await sheet.loadCells('G1:G2');
     const g1 = sheet.getCellByA1('G1');
     const g2 = sheet.getCellByA1('G2');
@@ -169,59 +197,77 @@ export type Reading = {
   count: number;
   date: string; // YYYY-MM-DD
   timestamp: string;
+  dhikrId?: string;
 }
 
-export async function addReading(name: string, count: number) {
+export async function addReading(name: string, count: number, dhikrId: string = '1') {
   const doc = await getDoc();
   const settings = await getSettings(doc);
   const sheet = await getSheet(doc, settings.resetHour);
   const date = getEffectiveDate(settings.resetHour);
   const timestamp = new Date().toISOString();
 
+  // Ensure header has "Zikir Türü" if it's an old sheet
+  try {
+     await sheet.loadHeaderRow();
+     if (!sheet.headerValues.includes('Zikir Türü')) {
+         const newHeaders = [...sheet.headerValues, 'Zikir Türü'];
+         await sheet.setHeaderRow(newHeaders);
+     }
+  } catch(e) {
+     // Ignore header errors for empty sheets
+  }
+
   await sheet.addRow({
     'Tarih': `'${date}`,
     'İsim': name,
     'Adet': count,
     'Zaman': timestamp,
+    'Zikir Türü': dhikrId,
   });
 }
 
-export async function getDailyTotal(): Promise<{ total: number, date: string, userCounts: Record<string, number>, settings: DynamicSettings }> {
+export async function getDailyTotal(): Promise<{ 
+  totals: Record<string, number>, 
+  date: string, 
+  userCounts: Record<string, Record<string, number>>, 
+  settings: DynamicSettings 
+}> {
   const doc = await getDoc();
   const settings = await getSettings(doc);
   const sheet = await getSheet(doc, settings.resetHour);
   const effectiveDate = getEffectiveDate(settings.resetHour);
 
-  // G2 hücresindeki SUM formülünü oku — bu sheet sadece bugünün verilerini içerir
-  await sheet.loadCells('G2');
-  const g2Value = sheet.getCellByA1('G2').value;
-
-  let total = 0;
-  if (typeof g2Value === 'number') {
-    total = g2Value;
-  }
-
-  // Kullanıcı bazlı dağılım (Smart Correction için gerekli)
   const rows = await sheet.getRows();
-  const userCounts: Record<string, number> = {};
-  let calculatedTotal = 0;
+  const totals: Record<string, number> = {};
+  const userCounts: Record<string, Record<string, number>> = {};
+
+  // Initialize with 0s based on defined dhikrs
+  settings.dhikrs.forEach(d => {
+      totals[d.id] = 0;
+      userCounts[d.id] = {};
+  });
 
   rows.forEach(row => {
     const countVal = row.get('Adet');
     const count = parseInt(countVal || '0', 10);
     const name = row.get('İsim') || 'Anonim';
+    let dhikrId = String(row.get('Zikir Türü') || '').trim();
+    
+    // Default to first dhikr if empty or undefined
+    if (!dhikrId) {
+        dhikrId = settings.dhikrs.length > 0 ? settings.dhikrs[0].id : '1';
+    }
+
+    if (!totals[dhikrId]) totals[dhikrId] = 0;
+    if (!userCounts[dhikrId]) userCounts[dhikrId] = {};
 
     if (!isNaN(count)) {
-      calculatedTotal += count;
-      userCounts[name] = (userCounts[name] || 0) + count;
+      totals[dhikrId] += count;
+      userCounts[dhikrId][name] = (userCounts[dhikrId][name] || 0) + count;
     }
   });
 
-  // G2 boşsa/geçersizse satırlardan hesapla
-  if (typeof g2Value !== 'number') {
-    total = calculatedTotal;
-  }
-
-  return { total, date: effectiveDate, userCounts, settings };
+  return { totals, date: effectiveDate, userCounts, settings };
 }
 
