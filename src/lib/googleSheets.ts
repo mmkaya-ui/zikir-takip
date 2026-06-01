@@ -216,6 +216,17 @@ export async function getSheet(doc: GoogleSpreadsheet, resetHour: number) {
     g1.value = 'Toplam';
     g2.formula = '=SUM(C2:C10000)';
     await sheet.saveUpdatedCells();
+  } else {
+    // Eğer sheet zaten varsa (eski sistemden kalmışsa), "Zikir Türü" başlığını kontrol et ve ekle.
+    try {
+      await sheet.loadHeaderRow();
+      if (!sheet.headerValues.includes('Zikir Türü')) {
+         const newHeaders = [...sheet.headerValues, 'Zikir Türü'];
+         await sheet.setHeaderRow(newHeaders);
+      }
+    } catch(e) {
+       // Ignore if sheet is completely empty and throws header error
+    }
   }
 
   cachedSheet = sheet;
