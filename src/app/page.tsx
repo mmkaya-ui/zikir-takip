@@ -222,23 +222,21 @@ export default function Home() {
                 <div className="text-sm text-blue-500 mt-2 uppercase tracking-[0.2em] font-bold opacity-90 transition-none">
                   Bugünkü Toplam
                 </div>
-                {userName && (
-                  <button
-                    onClick={() => setShowMyTotal(!showMyTotal)}
-                    className={`mt-2 text-xs font-bold px-3 py-1 rounded-full border transition-all active:scale-95 ${showMyTotal
-                      ? theme === 'oled'
-                        ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                        : 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                      : theme === 'oled'
-                        ? 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
-                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
-                      }`}
-                  >
-                    {showMyTotal
-                      ? `${userName}: ${(userCounts[userName] || 0).toLocaleString()} adet 📊`
-                      : 'Kendi Adedim 👤'}
-                  </button>
-                )}
+                <button
+                  onClick={() => setShowMyTotal(!showMyTotal)}
+                  className={`mt-2 text-xs font-bold px-3 py-1 rounded-full border transition-all active:scale-95 ${showMyTotal
+                    ? theme === 'oled'
+                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                      : 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                    : theme === 'oled'
+                      ? 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                      : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
+                    }`}
+                >
+                  {showMyTotal
+                    ? `${userName || 'Sen'}: ${(userName && userCounts[userName] ? userCounts[userName] : 0).toLocaleString()} adet 📊`
+                    : 'Kendi Adedim 👤'}
+                </button>
               </div>
 
               <ProgressBar current={total} target={target} theme={theme} />
