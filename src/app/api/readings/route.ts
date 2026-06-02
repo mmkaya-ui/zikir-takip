@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { addReading, getDailyTotal, DynamicSettings } from '../../../lib/googleSheets';
+import { addReading, getDailyTotal, DynamicSettings, normalizeName } from '../../../lib/googleSheets';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -62,7 +62,8 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, count, confirmCorrection, dhikrId = '1' } = body;
+        let { name, count, confirmCorrection, dhikrId = '1' } = body;
+        name = normalizeName(name);
         let finalCount = parseInt(count, 10);
 
         if (!name || isNaN(finalCount)) {

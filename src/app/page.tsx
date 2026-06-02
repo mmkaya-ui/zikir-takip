@@ -2,7 +2,7 @@
 
 import useSWR from 'swr';
 import { useState, useEffect } from 'react';
-import ReadingForm from './components/ReadingForm';
+import ReadingForm, { normalizeName } from './components/ReadingForm';
 import ProgressBar from './components/ProgressBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from './context/SettingsContext';
@@ -30,7 +30,12 @@ export default function Home() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('userName');
-      if (saved) setUserName(saved);
+      if (saved) {
+          const norm = normalizeName(saved);
+          setUserName(norm);
+          localStorage.setItem('userName', norm); // Update localstorage to the clean version
+      }
+
       
       const savedDhikr = localStorage.getItem('activeDhikrId');
       if (savedDhikr) setActiveDhikrId(savedDhikr);
@@ -57,12 +62,19 @@ export default function Home() {
   const resetHour = data?.settings?.resetHour ?? 22;
 
   const dateStr = data?.date;
-  const formattedDate = dateStr ? new Date(dateStr).toLocaleDateString('tr-TR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    weekday: 'long'
-  }) + ' (TR)' : 'Yükleniyor...';
+  let formattedDate = 'Yükleniyor...';
+  if (dateStr) {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 12, 0, 0);
+          formattedDate = d.toLocaleDateString('tr-TR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            weekday: 'long'
+          }) + ' (TR)';
+      }
+  }
 
   const errorMessage = data?.error;
 
@@ -252,7 +264,7 @@ export default function Home() {
               if (newData?.name) {
                 setUserName(newData.name);
               }
-              if (newData && data) {
+              if (newData && newData.newTotal !== undefined && data) {
                 mutate({
                   ...data,
                   totals: {

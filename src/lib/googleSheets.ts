@@ -257,6 +257,13 @@ export type Reading = {
   dhikrId?: string;
 }
 
+export function normalizeName(name: string): string {
+  if (!name) return 'Anonim';
+  const noSpaceName = name.replace(/\s+/g, '');
+  if (!noSpaceName) return 'Anonim';
+  return noSpaceName.charAt(0).toLocaleUpperCase('tr-TR') + noSpaceName.slice(1).toLocaleLowerCase('tr-TR');
+}
+
 export async function addReading(name: string, count: number, dhikrId: string = '1') {
   const doc = await getDoc();
   const settings = await getSettings(doc);
@@ -266,7 +273,7 @@ export async function addReading(name: string, count: number, dhikrId: string = 
 
   await sheet.addRow({
     'Tarih': `'${date}`,
-    'İsim': name,
+    'İsim': normalizeName(name),
     'Adet': count,
     'Zaman': timestamp,
     'Zikir Türü': dhikrId,
@@ -297,7 +304,8 @@ export async function getDailyTotal(): Promise<{
   rows.forEach((row: any) => {
     const countVal = row.get('Adet');
     const count = parseInt(countVal || '0', 10);
-    const name = row.get('İsim') || 'Anonim';
+    const rawName = row.get('İsim') || 'Anonim';
+    const name = normalizeName(rawName);
     let dhikrId = String(row.get('Zikir Türü') || '').trim();
     
     // Default to first dhikr if empty or undefined

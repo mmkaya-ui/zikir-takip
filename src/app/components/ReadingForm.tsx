@@ -3,7 +3,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhikrId: string, onAdd: (data?: { name: string, newTotal: number, newUserCount: number }) => void, theme?: string }) {
+export function normalizeName(name: string): string {
+    if (!name) return '';
+    const noSpaceName = name.replace(/\s+/g, '');
+    if (!noSpaceName) return '';
+    return noSpaceName.charAt(0).toLocaleUpperCase('tr-TR') + noSpaceName.slice(1).toLocaleLowerCase('tr-TR');
+}
+
+export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhikrId: string, onAdd: (data?: { name: string, newTotal?: number, newUserCount?: number }) => void, theme?: string }) {
     const [name, setName] = useState('');
     const [count, setCount] = useState('');
     const [loading, setLoading] = useState(false);
@@ -34,9 +41,12 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
             window.navigator.vibrate(50); // 50ms light vibration
         }
 
-        if (!name || !count) return;
+        const normalizedName = normalizeName(name);
+        if (!normalizedName || !count) return;
 
         const finalCount = parseInt(count);
+        if (isNaN(finalCount) || finalCount === 0) return;
+        
         if (Math.abs(finalCount) > 10000) {
             alert('Tek seferde en fazla 10.000 girilebilir.');
             return;
@@ -48,7 +58,7 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
 
         setLoading(true);
         try {
-            localStorage.setItem('userName', name);
+            localStorage.setItem('userName', normalizedName);
         } catch (e) {
             console.error('LocalStorage set error:', e);
         }
@@ -59,7 +69,7 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name,
+                    name: normalizedName,
                     count: finalCount,
                     confirmCorrection: forceConfirm,
                     dhikrId: activeDhikrId
@@ -72,11 +82,11 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
                 setCount('');
                 setSuccess(true);
                 setSuccessMessage(Math.random() > 0.5 ? 'Allah Kabul Etsin 🤲' : 'Allah Razı Olsun 🌹');
-                // Pass optimistic data if available
+                // Pass optimistic data if available, otherwise just pass the name
                 if (data.newTotal !== undefined) {
-                    onAdd({ name, newTotal: data.newTotal, newUserCount: data.newUserCount });
+                    onAdd({ name: normalizedName, newTotal: data.newTotal, newUserCount: data.newUserCount });
                 } else {
-                    onAdd();
+                    onAdd({ name: normalizedName });
                 }
             } else if (res.status === 409 && data.requiresConfirmation) {
                 // Show confirmation dialog logic
