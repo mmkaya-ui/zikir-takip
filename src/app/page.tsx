@@ -28,11 +28,15 @@ export default function Home() {
   const dhikrs: {id: string, name: string, target: number}[] = data?.settings?.dhikrs || [{ id: '1', name: 'Yükleniyor...', target: 100000 }];
 
   useEffect(() => {
-    const saved = localStorage.getItem('userName');
-    if (saved) setUserName(saved);
-    
-    const savedDhikr = localStorage.getItem('activeDhikrId');
-    if (savedDhikr) setActiveDhikrId(savedDhikr);
+    try {
+      const saved = localStorage.getItem('userName');
+      if (saved) setUserName(saved);
+      
+      const savedDhikr = localStorage.getItem('activeDhikrId');
+      if (savedDhikr) setActiveDhikrId(savedDhikr);
+    } catch (e) {
+      console.error('LocalStorage access error:', e);
+    }
   }, []);
 
   // If the active dhikr is deleted or we loaded new data and it's missing, fallback to the first one
@@ -170,7 +174,9 @@ export default function Home() {
                 key={d.id}
                 onClick={() => {
                   setActiveDhikrId(d.id);
-                  localStorage.setItem('activeDhikrId', d.id);
+                  try {
+                    localStorage.setItem('activeDhikrId', d.id);
+                  } catch(e) {}
                 }}
                 className={`px-4 py-2 rounded-full font-bold text-sm whitespace-nowrap snap-center transition-all ${
                   activeDhikrId === d.id
@@ -245,6 +251,9 @@ export default function Home() {
           <ReadingForm
             activeDhikrId={activeDhikrId}
             onAdd={(newData) => {
+              if (newData?.name) {
+                setUserName(newData.name);
+              }
               if (newData && data) {
                 mutate({
                   ...data,

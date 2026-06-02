@@ -11,8 +11,12 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
     const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
-        const savedName = localStorage.getItem('userName');
-        if (savedName) setName(savedName);
+        try {
+            const savedName = localStorage.getItem('userName');
+            if (savedName) setName(savedName);
+        } catch (e) {
+            console.error('LocalStorage access error:', e);
+        }
     }, []);
 
     useEffect(() => {
@@ -43,7 +47,11 @@ export default function ReadingForm({ activeDhikrId, onAdd, theme }: { activeDhi
         }
 
         setLoading(true);
-        localStorage.setItem('userName', name);
+        try {
+            localStorage.setItem('userName', name);
+        } catch (e) {
+            console.error('LocalStorage set error:', e);
+        }
 
         try {
 
