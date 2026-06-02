@@ -246,7 +246,7 @@ export default function Home() {
                     }`}
                 >
                   {showMyTotal
-                    ? `${userName || 'Sen'}: ${(userName && userCounts[userName] ? userCounts[userName] : 0).toLocaleString()} adet 📊`
+                    ? `${(userName && userCounts[userName] ? userCounts[userName] : 0).toLocaleString()} adet`
                     : 'Kendi Adedim 👤'}
                 </button>
               </div>
