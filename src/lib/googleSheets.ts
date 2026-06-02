@@ -269,7 +269,16 @@ export async function addReading(name: string, count: number, dhikrId: string = 
   const settings = await getSettings(doc);
   const sheet = await getSheet(doc, settings);
   const date = getEffectiveDate(settings.resetHour);
-  const timestamp = new Date().toISOString();
+  
+  // Format the timestamp exactly to Turkey Time (TRT)
+  const trtNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
+  const yyyy = trtNow.getFullYear();
+  const mm = String(trtNow.getMonth() + 1).padStart(2, '0');
+  const dd = String(trtNow.getDate()).padStart(2, '0');
+  const hh = String(trtNow.getHours()).padStart(2, '0');
+  const min = String(trtNow.getMinutes()).padStart(2, '0');
+  const ss = String(trtNow.getSeconds()).padStart(2, '0');
+  const timestamp = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
 
   await sheet.addRow({
     'Tarih': `'${date}`,
