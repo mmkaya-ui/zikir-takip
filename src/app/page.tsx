@@ -247,7 +247,7 @@ export default function Home() {
                 >
                   {showMyTotal
                     ? `${(userName && userCounts[userName] ? userCounts[userName] : 0).toLocaleString()} adet`
-                    : 'Kendi Adedim 👤'}
+                    : 'Kendi Adedim'}
                 </button>
               </div>
 
